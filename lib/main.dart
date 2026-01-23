@@ -1,4 +1,5 @@
 import 'package:app_twins/objectives_selection_page.dart';
+import 'package:app_twins/welcome_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         textTheme: TextTheme(),
       ),
-      home: const ObjectivesSelectionPage(), // Testando ObjectivesSelectionPage
+      home: WelcomePage(), // Testando ObjectivesSelectionPage
     );
   }
 }

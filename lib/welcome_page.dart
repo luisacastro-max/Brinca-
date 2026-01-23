@@ -18,8 +18,14 @@ class WelcomePage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Passo 1 de 4", style: buttonTextStyle.copyWith(color: Colors.grey[600])),
-                  Text("25%", style: buttonTextStyle.copyWith(color: Colors.grey[600])),
+                  Text(
+                    "Passo 1 de 4",
+                    style: buttonTextStyle.copyWith(color: Colors.grey[600]),
+                  ),
+                  Text(
+                    "25%",
+                    style: buttonTextStyle.copyWith(color: Colors.grey[600]),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -52,23 +58,32 @@ class WelcomePage extends StatelessWidget {
 
               // Logo Brinca+
               Image.asset(
-                'assets/images/brinca_logo.png',
+                "assets/images/brinca_mais_logo_welcome.jpeg",
                 width: 250,
                 height: 150,
                 fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
+                alignment: AlignmentGeometry.center,
               ),
               const SizedBox(height: 40),
 
               // Textos de Boas-vindas
               Text(
                 "Bem-vindo(a) ao Brinca+!",
-                style: containerTextStyle.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                style: containerTextStyle.copyWith(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               Text(
                 "Vamos ajudá-lo a criar atividades educativas e divertidas para seus filhos, reduzindo o tempo de tela de forma prática e personalizada.",
-                style: buttonTextStyle.copyWith(fontSize: 14, color: Colors.grey[600], height: 1.5),
+                style: buttonTextStyle.copyWith(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 50),
@@ -77,9 +92,21 @@ class WelcomePage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildFeatureIcon(Icons.favorite_border, "Atividades\nPersonalizadas", const Color(0xFFFCA1AA)),
-                  _buildFeatureIcon(Icons.star_border, "Desenvolvimento\nIntegral", const Color(0xFF7AA4E3)),
-                  _buildFeatureIcon(Icons.track_changes, "Fácil de Usar", const Color(0xFFA8D8BB)),
+                  _buildFeatureIcon(
+                    Icons.favorite_border,
+                    "Atividades\nPersonalizadas",
+                    const Color(0xFFFCA1AA),
+                  ),
+                  _buildFeatureIcon(
+                    Icons.star_border,
+                    "Desenvolvimento\nIntegral",
+                    const Color(0xFF7AA4E3),
+                  ),
+                  _buildFeatureIcon(
+                    Icons.track_changes,
+                    "Fácil de Usar",
+                    const Color(0xFFA8D8BB),
+                  ),
                 ],
               ),
               const SizedBox(height: 60),
@@ -90,7 +117,9 @@ class WelcomePage extends StatelessWidget {
                   // Navegação para o Passo 2 (Seleção de Crianças)
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ChildrenSelectionPage()),
+                    MaterialPageRoute(
+                      builder: (context) => const ChildrenSelectionPage(),
+                    ),
                   );
                 },
                 child: Container(
@@ -148,7 +177,10 @@ class WelcomePage extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           label,
-          style: buttonTextStyle.copyWith(fontSize: 10, fontWeight: FontWeight.w600),
+          style: buttonTextStyle.copyWith(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          ),
           textAlign: TextAlign.center,
         ),
       ],
