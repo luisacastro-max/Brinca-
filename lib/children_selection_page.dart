@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:app_twins/theme/theme_data_base.dart';
 import 'children_option.dart';
 import 'gradient_progress_bar.dart';
+import 'child_details_page.dart';
 
 class ChildrenSelectionPage extends StatefulWidget {
   const ChildrenSelectionPage({super.key});
@@ -102,8 +103,21 @@ class _ChildrenSelectionPageState extends State<ChildrenSelectionPage> {
                 onPressed: () => Navigator.pop(context),
                 child: const Text("Voltar"),
               ),
+
               ElevatedButton(
-                onPressed: selectedChildren == null ? null : () {},
+                onPressed: selectedChildren == null
+                    ? null
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChildDetailsPage(
+                              quantidadeTotal: selectedChildren!,
+                              indiceAtual: 1,
+                            ),
+                          ),
+                        );
+                      },
                 child: const Text("Continuar"),
               ),
             ],

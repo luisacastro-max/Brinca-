@@ -4,6 +4,7 @@ import 'package:app_twins/widgets/child_name_field.dart';
 import 'package:app_twins/widgets/progress_header.dart';
 import 'package:app_twins/widgets/time_options.dart';
 import 'package:flutter/material.dart';
+import 'package:app_twins/objectives_selection_page.dart';
 
 class ChildDetailsPage extends StatefulWidget {
   final int quantidadeTotal;
@@ -39,18 +40,11 @@ class _ChildDetailsPageState extends State<ChildDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header com progresso
             const ProgressHeader(step: "Passo 3 de 4", percentage: "75%"),
             const SizedBox(height: 20),
-
-            // Formulário
             _buildForm(context),
-
             const SizedBox(height: 30),
-
-            // Botões de ação
             _buildFooter(context),
-
             const SizedBox(height: 20),
           ],
         ),
@@ -64,22 +58,15 @@ class _ChildDetailsPageState extends State<ChildDetailsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avatar da criança
           ChildAvatar(childIndex: widget.indiceAtual),
           const SizedBox(height: 30),
-
-          // Nome
           const ChildNameField(),
           const SizedBox(height: 30),
-
-          // Idade
           AgeGrid(
             selectedIndex: selectedAge,
             onSelectAge: (index) => setState(() => selectedAge = index),
           ),
           const SizedBox(height: 30),
-
-          // Tempo
           TimeOptions(
             selectedIndex: selectedTime,
             onSelectTime: (index) => setState(() => selectedTime = index),
@@ -93,7 +80,6 @@ class _ChildDetailsPageState extends State<ChildDetailsPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Expanded(
             child: OutlinedButton(
@@ -117,7 +103,13 @@ class _ChildDetailsPageState extends State<ChildDetailsPage> {
                           ),
                         );
                       } else {
-                        debugPrint("Finalizado cadastro de ${widget.quantidadeTotal} crianças");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const ObjectivesSelectionPage(),
+                          ),
+                        );
                       }
                     }
                   : null,
@@ -129,4 +121,3 @@ class _ChildDetailsPageState extends State<ChildDetailsPage> {
     );
   }
 }
-
