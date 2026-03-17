@@ -1,7 +1,9 @@
 import 'package:app_twins/children_option.dart';
-import 'package:app_twins/gradient_progress_bar.dart';
 import 'package:app_twins/theme/theme_data_base.dart';
 import 'package:flutter/material.dart';
+
+import 'design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
+import 'design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
 
 class ObjectivesSelectionPage extends StatefulWidget {
   const ObjectivesSelectionPage({super.key});
@@ -60,7 +62,19 @@ class _ObjectivesSelectionPageState extends State<ObjectivesSelectionPage> {
             ],
           ),
           const SizedBox(height: 8),
-          const GradientProgressBar(progress: 1.0),
+          GradientProgressBarComponent.instantiate(
+            viewModel: GradientProgressBarViewModel(
+              progress: 1.0,
+              height: 8,
+              backgroundColor: Colors.grey[200]!,
+              gradientColors: const [
+                Color(0xFFFCA1AA),
+                Color(0xFF7AA4E3),
+                Color(0xFFA8D8BB),
+              ],
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
           const SizedBox(height: 40),
 
           // Título Objetivos
