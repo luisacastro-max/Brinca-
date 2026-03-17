@@ -4,5 +4,5 @@
 /// Ajuste o IP/porta conforme necessário. Use "https://" se o servidor
 /// suportar HTTPS.
 class ApiConfig {
-  static const String baseUrl = 'http://192.168.200.199:4000';
+  static const String baseUrl = 'http://localhost:4000';
 }
