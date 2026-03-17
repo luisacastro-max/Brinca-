@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:app_twins/theme/theme_data_base.dart';
 import 'children_option.dart';
-import 'gradient_progress_bar.dart';
+import 'design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
+import 'design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
 import 'child_details_page.dart';
 
 class ChildrenSelectionPage extends StatefulWidget {
@@ -40,9 +41,19 @@ class _ChildrenSelectionPageState extends State<ChildrenSelectionPage> {
             ],
           ),
           const SizedBox(height: 8),
-
-          const GradientProgressBar(progress: 0.5),
-
+          GradientProgressBarComponent.instantiate(
+            viewModel: GradientProgressBarViewModel(
+              progress: 0.5,
+              height: 8,
+              backgroundColor: Colors.grey[200]!,
+              gradientColors: const [
+                Color(0xFFFCA1AA),
+                Color(0xFF7AA4E3),
+                Color(0xFFA8D8BB),
+              ],
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
           const SizedBox(height: 40),
 
           Container(

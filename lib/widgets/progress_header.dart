@@ -1,6 +1,9 @@
 import 'package:app_twins/theme/theme_data_base.dart';
 import 'package:flutter/material.dart';
 
+import '../design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
+import '../design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
+
 class ProgressHeader extends StatelessWidget {
   final String step;
   final String percentage;
@@ -25,43 +28,18 @@ class ProgressHeader extends StatelessWidget {
               Text(percentage, style: buttonTextStyle.copyWith(color: Colors.blue)),
             ],
           ),
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
+          const SizedBox(height: 8),
+          GradientProgressBarComponent.instantiate(
+            viewModel: GradientProgressBarViewModel(
+              progress: 0.75,
               height: 8,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 75,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFFFCA1AA),
-                            Color(0xFFFFD54F),
-                            Color(0xFFA8D8BB),
-                            Color(0xFF7AA4E3),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 25,
-                    child: Container(
-                      color: Colors.grey[200],
-                    ),
-                  ),
-                ],
-              ),
+              backgroundColor: Colors.grey[200]!,
+              gradientColors: const [
+                Color(0xFFFCA1AA),
+                Color(0xFF7AA4E3),
+                Color(0xFFA8D8BB),
+              ],
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
         ],

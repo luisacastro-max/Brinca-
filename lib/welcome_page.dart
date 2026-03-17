@@ -1,6 +1,9 @@
+import 'package:app_twins/design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
 import 'package:app_twins/theme/theme_data_base.dart';
 import 'package:app_twins/children_selection_page.dart';
 import 'package:flutter/material.dart';
+
+import 'design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -29,29 +32,17 @@ class WelcomePage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Container(
-                height: 6,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
+              GradientProgressBarComponent.instantiate(
+                viewModel: GradientProgressBarViewModel(
+                  progress: 0.25,
+                  height: 8,
+                  backgroundColor: Colors.grey[200]!,
+                  gradientColors: const [
+                    Color(0xFFFCA1AA),
+                    Color(0xFF7AA4E3),
+                    Color(0xFFA8D8BB),
+                  ],
                   borderRadius: BorderRadius.circular(10),
-                ),
-                child: FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: 0.25,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFFFCA1AA),
-                          Color(0xFFFEC578),
-                          Color(0xFF7AA4E3),
-                          Color(0xFFA8D8BB),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
                 ),
               ),
               const SizedBox(height: 50),
