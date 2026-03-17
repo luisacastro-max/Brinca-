@@ -1,7 +1,7 @@
-import 'package:app_twins/services/mongo/mongo_service.dart';
+import 'package:app_twins/services/service.dart';
+import 'package:app_twins/pages/registration_page/registration_page_router.dart';
+import 'package:app_twins/welcome_page.dart';
 import 'package:flutter/material.dart';
-// Importe aqui o arquivo onde está o seu MongoService
-// import 'package:seu_projeto/services/mongo_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,14 +11,14 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final AuthApi _authApi = ServiceSdk.instance.auth;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  // Método de Login integrado ao MongoService
   Future<void> _realizarLogin() async {
     final String email = _emailController.text.trim();
-    final String senha = _passwordController.text.trim();
+    final String senha = _passwordController.text;
 
     if (email.isEmpty || senha.isEmpty) {
       _showSnackBar("Por favor, preencha todos os campos.");
@@ -28,26 +28,28 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Chama o método que você já criou no MongoService
-       bool sucesso = await MongoService.verificarLogin(email, senha);
-      
-      // Simulação para teste (Remova o Future.delayed e use a linha acima)
-     // await Future.delayed(const Duration(seconds: 2));
-     // bool sucesso = true;  Simulação de sucesso
+      await _authApi.login(email: email, password: senha);
+      if (!mounted) return;
 
-      if (sucesso) {
-        if (!mounted) return;
-        // Navega para a próxima tela (Cadastro da Criança - Passo 2 de 4)
-        // Navigator.pushReplacementNamed(context, '/cadastro_passo2');
-        _showSnackBar("Login realizado com sucesso!", isError: false);
-      } else {
-        _showSnackBar("Email ou senha incorretos.");
-      }
-    } catch (e) {
+      _showSnackBar("Login realizado com sucesso!", isError: false);
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const WelcomePage()),
+      );
+    } on ServiceException catch (e) {
+      _showSnackBar(e.message);
+    } catch (_) {
       _showSnackBar("Erro ao conectar ao servidor.");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   void _showSnackBar(String message, {bool isError = true}) {
@@ -154,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -181,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Text("Ainda não tem conta? "),
                   GestureDetector(
                     onTap: () {
-                      // Navegar para tela de registro
+                      RegistrationPageRouter.go(context);
                     },
                     child: const Text(
                       "Cadastre-se",
