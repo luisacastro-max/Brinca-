@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../design_system/components/auth_text_field/auth_text_field.dart';
+import '../design_system/components/auth_text_field/auth_text_field_vm.dart';
+
 class AuthTextField extends StatelessWidget {
   const AuthTextField({
     super.key,
@@ -18,28 +21,13 @@ class AuthTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: Colors.grey.shade400, size: 20),
-        hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-        filled: true,
-        fillColor: const Color(0xFFF8FBFB),
-        contentPadding: const EdgeInsets.symmetric(vertical: 18),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade100),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Color(0xFFA8E6CF), width: 1.5),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
+    return AuthTextFieldComponent.instantiate(
+      viewModel: AuthTextFieldViewModel(
+        controller: controller,
+        hint: hint,
+        icon: icon,
+        isPassword: isPassword,
+        keyboardType: keyboardType,
       ),
     );
   }

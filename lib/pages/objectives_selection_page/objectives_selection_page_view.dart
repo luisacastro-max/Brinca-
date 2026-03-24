@@ -1,19 +1,19 @@
 import 'package:app_twins/children_option.dart';
+import 'package:app_twins/design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
+import 'package:app_twins/design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
+import 'package:app_twins/pages/objectives_selection_page/objectives_selection_page_router.dart';
 import 'package:app_twins/theme/theme_data_base.dart';
 import 'package:flutter/material.dart';
 
-import 'design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
-import 'design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
-
-class ObjectivesSelectionPage extends StatefulWidget {
-  const ObjectivesSelectionPage({super.key});
+class ObjectivesSelectionPageView extends StatefulWidget {
+  const ObjectivesSelectionPageView({super.key});
 
   @override
-  State<ObjectivesSelectionPage> createState() =>
-      _ObjectivesSelectionPageState();
+  State<ObjectivesSelectionPageView> createState() =>
+      _ObjectivesSelectionPageViewState();
 }
 
-class _ObjectivesSelectionPageState extends State<ObjectivesSelectionPage> {
+class _ObjectivesSelectionPageViewState extends State<ObjectivesSelectionPageView> {
   final Set<int> selectedObjectives = {};
   final Set<int> selectedInterests = {};
 
@@ -47,18 +47,17 @@ class _ObjectivesSelectionPageState extends State<ObjectivesSelectionPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => ObjectivesSelectionPageRouter.goBack(context),
         ),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         children: [
-          // Progresso
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Passo 4 de 4", style: buttonTextStyle),
-              Text("100%", style: buttonTextStyle),
+              Text('Passo 4 de 4', style: buttonTextStyle),
+              Text('100%', style: buttonTextStyle),
             ],
           ),
           const SizedBox(height: 8),
@@ -76,10 +75,8 @@ class _ObjectivesSelectionPageState extends State<ObjectivesSelectionPage> {
             ),
           ),
           const SizedBox(height: 40),
-
-          // Título Objetivos
           Text(
-            "Objetivos de desenvolvimento",
+            'Objetivos de desenvolvimento',
             style: containerTextStyle.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -87,15 +84,13 @@ class _ObjectivesSelectionPageState extends State<ObjectivesSelectionPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            "Escolha quantos quiser",
+            'Escolha quantos quiser',
             style: buttonTextStyle.copyWith(
               fontSize: 14,
               color: Colors.grey[600],
             ),
           ),
           const SizedBox(height: 20),
-
-          // Grid de Objetivos
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -124,20 +119,15 @@ class _ObjectivesSelectionPageState extends State<ObjectivesSelectionPage> {
               );
             },
           ),
-
           const SizedBox(height: 40),
-
-          // Título Interesses
           Text(
-            "Interesses da criança",
+            'Interesses da criança',
             style: containerTextStyle.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 20),
-
-          // Grid de Interesses
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -166,29 +156,25 @@ class _ObjectivesSelectionPageState extends State<ObjectivesSelectionPage> {
               );
             },
           ),
-
           const SizedBox(height: 40),
-
-          // Botões
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Voltar"),
+                onPressed: () => ObjectivesSelectionPageRouter.goBack(context),
+                child: const Text('Voltar'),
               ),
               ElevatedButton(
                 onPressed: selectedObjectives.isEmpty || selectedInterests.isEmpty
                     ? null
                     : () {
-                        // Onboarding concluído!
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Perfil criado com sucesso!'),
                           ),
                         );
                       },
-                child: const Text("Continuar"),
+                child: const Text('Continuar'),
               ),
             ],
           ),

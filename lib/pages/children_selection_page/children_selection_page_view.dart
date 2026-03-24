@@ -1,18 +1,19 @@
-import 'package:flutter/material.dart';
+import 'package:app_twins/children_option.dart';
+import 'package:app_twins/design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
+import 'package:app_twins/design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
+import 'package:app_twins/pages/children_selection_page/children_selection_page_router.dart';
 import 'package:app_twins/theme/theme_data_base.dart';
-import 'children_option.dart';
-import 'design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
-import 'design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
-import 'child_details_page.dart';
+import 'package:flutter/material.dart';
 
-class ChildrenSelectionPage extends StatefulWidget {
-  const ChildrenSelectionPage({super.key});
+class ChildrenSelectionPageView extends StatefulWidget {
+  const ChildrenSelectionPageView({super.key});
 
   @override
-  State<ChildrenSelectionPage> createState() => _ChildrenSelectionPageState();
+  State<ChildrenSelectionPageView> createState() =>
+      _ChildrenSelectionPageViewState();
 }
 
-class _ChildrenSelectionPageState extends State<ChildrenSelectionPage> {
+class _ChildrenSelectionPageViewState extends State<ChildrenSelectionPageView> {
   int? selectedChildren;
 
   void select(int value) {
@@ -27,7 +28,7 @@ class _ChildrenSelectionPageState extends State<ChildrenSelectionPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => ChildrenSelectionPageRouter.goBack(context),
         ),
       ),
       body: ListView(
@@ -36,8 +37,8 @@ class _ChildrenSelectionPageState extends State<ChildrenSelectionPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Passo 2 de 4", style: buttonTextStyle),
-              Text("50%", style: buttonTextStyle),
+              Text('Passo 2 de 4', style: buttonTextStyle),
+              Text('50%', style: buttonTextStyle),
             ],
           ),
           const SizedBox(height: 8),
@@ -55,7 +56,6 @@ class _ChildrenSelectionPageState extends State<ChildrenSelectionPage> {
             ),
           ),
           const SizedBox(height: 40),
-
           Container(
             width: 120,
             height: 120,
@@ -71,65 +71,49 @@ class _ChildrenSelectionPageState extends State<ChildrenSelectionPage> {
             ),
             child: const Icon(Icons.people, size: 60, color: Colors.white),
           ),
-
           const SizedBox(height: 30),
-
           Text(
-            "Quantos filhos você quer cadastrar?",
+            'Quantos filhos voce quer cadastrar?',
             style: containerTextStyle.copyWith(fontSize: 18),
             textAlign: TextAlign.center,
           ),
-
           const SizedBox(height: 40),
-
           ChildrenOption(
-            label: "1 criança",
+            label: '1 crianca',
             color: const Color(0xFFFCA1AA),
             selected: selectedChildren == 1,
             onTap: () => select(1),
           ),
           const SizedBox(height: 20),
-
           ChildrenOption(
-            label: "2 crianças",
+            label: '2 criancas',
             color: const Color(0xFFA8D8BB),
             selected: selectedChildren == 2,
             onTap: () => select(2),
           ),
           const SizedBox(height: 20),
-
           ChildrenOption(
-            label: "3+ crianças",
+            label: '3+ criancas',
             color: const Color(0xFF7AA4E3),
             selected: selectedChildren == 3,
             onTap: () => select(3),
           ),
-
           const SizedBox(height: 50),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Voltar"),
+                onPressed: () => ChildrenSelectionPageRouter.goBack(context),
+                child: const Text('Voltar'),
               ),
-
               ElevatedButton(
                 onPressed: selectedChildren == null
                     ? null
-                    : () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChildDetailsPage(
-                              quantidadeTotal: selectedChildren!,
-                              indiceAtual: 1,
-                            ),
-                          ),
-                        );
-                      },
-                child: const Text("Continuar"),
+                    : () => ChildrenSelectionPageRouter.goToChildDetails(
+                          context: context,
+                          quantidadeTotal: selectedChildren!,
+                        ),
+                child: const Text('Continuar'),
               ),
             ],
           ),
