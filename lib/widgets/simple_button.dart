@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../design_system/components/simple_button/simple_button.dart';
+import '../design_system/components/simple_button/simple_button_vm.dart';
+
 class SimpleButton extends StatelessWidget {
   final String label;
   final bool isFullWidth;
@@ -12,22 +15,10 @@ class SimpleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: isFullWidth ? 50 : null,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey, width: 1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: isFullWidth ? 14 : 13,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
-          textAlign: TextAlign.center,
-        ),
+    return SimpleButtonComponent.instantiate(
+      viewModel: SimpleButtonViewModel(
+        label: label,
+        isFullWidth: isFullWidth,
       ),
     );
   }

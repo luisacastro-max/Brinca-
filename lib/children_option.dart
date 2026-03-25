@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'design_system/components/children_option/children_option.dart';
+import 'design_system/components/children_option/children_option_vm.dart';
+
 class ChildrenOption extends StatelessWidget {
   final String label;
   final Color color;
@@ -16,47 +19,12 @@ class ChildrenOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          gradient: selected
-              ? const LinearGradient(
-                  colors: [
-                    Color(0xFFFCA1AA),
-                    Color(0xFF7AA4E3),
-                    Color(0xFFA8D8BB),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          color: selected ? null : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: color, // Usa a cor específica de cada opção
-            width: 2,
-          ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : Colors.black,
-          ),
-          textAlign: TextAlign.center,
-        ),
+    return ChildrenOptionComponent.instantiate(
+      viewModel: ChildrenOptionViewModel(
+        label: label,
+        color: color,
+        selected: selected,
+        onTap: onTap,
       ),
     );
   }

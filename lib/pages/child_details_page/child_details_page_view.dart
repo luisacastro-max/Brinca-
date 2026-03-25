@@ -1,26 +1,26 @@
+import 'package:app_twins/pages/child_details_page/child_details_page_router.dart';
 import 'package:app_twins/widgets/age_grid.dart';
 import 'package:app_twins/widgets/child_avatar.dart';
 import 'package:app_twins/widgets/child_name_field.dart';
 import 'package:app_twins/widgets/progress_header.dart';
 import 'package:app_twins/widgets/time_options.dart';
 import 'package:flutter/material.dart';
-import 'package:app_twins/objectives_selection_page.dart';
 
-class ChildDetailsPage extends StatefulWidget {
+class ChildDetailsPageView extends StatefulWidget {
   final int quantidadeTotal;
   final int indiceAtual;
 
-  const ChildDetailsPage({
+  const ChildDetailsPageView({
     super.key,
     required this.quantidadeTotal,
     required this.indiceAtual,
   });
 
   @override
-  State<ChildDetailsPage> createState() => _ChildDetailsPageState();
+  State<ChildDetailsPageView> createState() => _ChildDetailsPageViewState();
 }
 
-class _ChildDetailsPageState extends State<ChildDetailsPage> {
+class _ChildDetailsPageViewState extends State<ChildDetailsPageView> {
   int? selectedAge;
   int? selectedTime;
 
@@ -33,16 +33,16 @@ class _ChildDetailsPageState extends State<ChildDetailsPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => ChildDetailsPageRouter.goBack(context),
         ),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const ProgressHeader(step: "Passo 3 de 4", percentage: "75%"),
+            const ProgressHeader(step: 'Passo 3 de 4', percentage: '75%'),
             const SizedBox(height: 20),
-            _buildForm(context),
+            _buildForm(),
             const SizedBox(height: 30),
             _buildFooter(context),
             const SizedBox(height: 20),
@@ -52,7 +52,7 @@ class _ChildDetailsPageState extends State<ChildDetailsPage> {
     );
   }
 
-  Widget _buildForm(BuildContext context) {
+  Widget _buildForm() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -83,8 +83,8 @@ class _ChildDetailsPageState extends State<ChildDetailsPage> {
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Voltar"),
+              onPressed: () => ChildDetailsPageRouter.goBack(context),
+              child: const Text('Voltar'),
             ),
           ),
           const SizedBox(width: 20),
@@ -93,27 +93,17 @@ class _ChildDetailsPageState extends State<ChildDetailsPage> {
               onPressed: (selectedAge != null && selectedTime != null)
                   ? () {
                       if (widget.indiceAtual < widget.quantidadeTotal) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChildDetailsPage(
-                              quantidadeTotal: widget.quantidadeTotal,
-                              indiceAtual: widget.indiceAtual + 1,
-                            ),
-                          ),
+                        ChildDetailsPageRouter.goToNextChild(
+                          context: context,
+                          quantidadeTotal: widget.quantidadeTotal,
+                          indiceAtual: widget.indiceAtual,
                         );
                       } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const ObjectivesSelectionPage(),
-                          ),
-                        );
+                        ChildDetailsPageRouter.goToObjectivesSelection(context);
                       }
                     }
                   : null,
-              child: const Text("Continuar"),
+              child: const Text('Continuar'),
             ),
           ),
         ],
