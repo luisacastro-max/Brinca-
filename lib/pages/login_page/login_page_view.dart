@@ -1,6 +1,6 @@
 import 'package:app_twins/pages/login_page/login_page_service.dart';
+import 'package:app_twins/pages/home_page/home_page_view.dart';
 import 'package:app_twins/pages/registration_page/registration_page_router.dart';
-import 'package:app_twins/pages/welcome_page/welcome_page_view.dart';
 import 'package:app_twins/widgets/auth_text_field.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:flutter/material.dart';
@@ -29,8 +29,9 @@ class _LoginPageViewState extends State<LoginPageView> {
 
       if (!mounted) return;
       _showSnackBar('Login realizado com sucesso!', isError: false);
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const WelcomePageView()),
+      await Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomePageView()),
+        (_) => false,
       );
     } on ServiceException catch (e) {
       if (!mounted) return;
