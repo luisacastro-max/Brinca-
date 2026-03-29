@@ -1,5 +1,6 @@
 import 'package:app_twins/pages/child_details_page/child_details_page_router.dart';
 import 'package:app_twins/pages/children_selection_page/children_selection_page_view.dart';
+import 'package:app_twins/model/onboarding_child_model.dart';
 import 'package:flutter/material.dart';
 
 class ChildrenSelectionPageRouter {
@@ -25,10 +26,16 @@ class ChildrenSelectionPageRouter {
     required BuildContext context,
     required int quantidadeTotal,
   }) {
+    final childrenDrafts = List<OnboardingChildModel>.generate(
+      quantidadeTotal,
+      (_) => OnboardingChildModel(),
+    );
+
     return ChildDetailsPageRouter.go(
       context: context,
       quantidadeTotal: quantidadeTotal,
       indiceAtual: 1,
+      childrenDrafts: childrenDrafts,
     );
   }
 }

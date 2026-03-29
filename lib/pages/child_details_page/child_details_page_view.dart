@@ -1,4 +1,5 @@
 import 'package:app_twins/pages/child_details_page/child_details_page_router.dart';
+import 'package:app_twins/model/onboarding_child_model.dart';
 import 'package:app_twins/widgets/age_grid.dart';
 import 'package:app_twins/widgets/child_avatar.dart';
 import 'package:app_twins/widgets/child_name_field.dart';
@@ -9,11 +10,13 @@ import 'package:flutter/material.dart';
 class ChildDetailsPageView extends StatefulWidget {
   final int quantidadeTotal;
   final int indiceAtual;
+  final List<OnboardingChildModel> childrenDrafts;
 
   const ChildDetailsPageView({
     super.key,
     required this.quantidadeTotal,
     required this.indiceAtual,
+    required this.childrenDrafts,
   });
 
   @override
@@ -21,8 +24,60 @@ class ChildDetailsPageView extends StatefulWidget {
 }
 
 class _ChildDetailsPageViewState extends State<ChildDetailsPageView> {
+  late final TextEditingController _nameController;
   int? selectedAge;
   int? selectedTime;
+
+  int get _currentIndex => widget.indiceAtual - 1;
+
+  @override
+  void initState() {
+    super.initState();
+    final currentDraft = widget.childrenDrafts[_currentIndex];
+    _nameController = TextEditingController(text: currentDraft.name);
+    selectedAge = currentDraft.ageOptionIndex;
+    selectedTime = currentDraft.timeOptionIndex;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _saveCurrentChildDraft() {
+    widget.childrenDrafts[_currentIndex] = widget.childrenDrafts[_currentIndex].copyWith(
+      name: _nameController.text.trim(),
+      ageOptionIndex: selectedAge,
+      timeOptionIndex: selectedTime,
+    );
+  }
+
+  void _onContinuePressed() {
+    if (_nameController.text.trim().isEmpty || selectedAge == null || selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha nome, idade e tempo da crianca.')),
+      );
+      return;
+    }
+
+    _saveCurrentChildDraft();
+
+    if (widget.indiceAtual < widget.quantidadeTotal) {
+      ChildDetailsPageRouter.goToNextChild(
+        context: context,
+        quantidadeTotal: widget.quantidadeTotal,
+        indiceAtual: widget.indiceAtual,
+        childrenDrafts: widget.childrenDrafts,
+      );
+      return;
+    }
+
+    ChildDetailsPageRouter.goToObjectivesSelection(
+      context: context,
+      childrenDrafts: widget.childrenDrafts,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +115,7 @@ class _ChildDetailsPageViewState extends State<ChildDetailsPageView> {
         children: [
           ChildAvatar(childIndex: widget.indiceAtual),
           const SizedBox(height: 30),
-          const ChildNameField(),
+          ChildNameField(controller: _nameController),
           const SizedBox(height: 30),
           AgeGrid(
             selectedIndex: selectedAge,
@@ -91,17 +146,7 @@ class _ChildDetailsPageViewState extends State<ChildDetailsPageView> {
           Expanded(
             child: ElevatedButton(
               onPressed: (selectedAge != null && selectedTime != null)
-                  ? () {
-                      if (widget.indiceAtual < widget.quantidadeTotal) {
-                        ChildDetailsPageRouter.goToNextChild(
-                          context: context,
-                          quantidadeTotal: widget.quantidadeTotal,
-                          indiceAtual: widget.indiceAtual,
-                        );
-                      } else {
-                        ChildDetailsPageRouter.goToObjectivesSelection(context);
-                      }
-                    }
+                  ? _onContinuePressed
                   : null,
               child: const Text('Continuar'),
             ),
