@@ -1,5 +1,4 @@
 class BackendEndpoints {
-
   static const String authRegister = '/api/auth/register';
   static const String authLogin = '/api/auth/login';
 
@@ -8,6 +7,7 @@ class BackendEndpoints {
   static const String children = '/api/children';
 
   static const String activities = '/api/activities';
+  static const String activitiesByIds = '/api/activities/by-ids';
   static String activityById(String id) => '/api/activities/$id';
   static String activitiesRecommended(String childId) =>
       '/api/activities/recommended/$childId';
