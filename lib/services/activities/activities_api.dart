@@ -8,7 +8,31 @@ class ActivitiesApi {
   final ServiceHttpClient _httpClient;
 
   Future<List<Map<String, dynamic>>> getActivities() async {
-    final response = await _httpClient.get(BackendEndpoints.activities);
+    final response = await _httpClient.get(
+      BackendEndpoints.activities,
+      requiresAuth: true,
+    );
+
+    if (response is List) {
+      return response
+          .whereType<Map>()
+          .map((item) => Map<String, dynamic>.from(item))
+          .toList();
+    }
+
+    return [];
+  }
+
+  Future<List<Map<String, dynamic>>> getActivitiesByIds(
+    List<String> activityIds,
+  ) async {
+    if (activityIds.isEmpty) return [];
+
+    final response = await _httpClient.post(
+      BackendEndpoints.activitiesByIds,
+      requiresAuth: true,
+      body: {'ids': activityIds},
+    );
 
     if (response is List) {
       return response

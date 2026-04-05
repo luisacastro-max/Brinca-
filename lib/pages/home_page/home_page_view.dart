@@ -1,5 +1,5 @@
-import 'package:app_twins/advanced_dashboard_page.dart';
-import 'package:app_twins/offline_activities_page.dart';
+import 'package:app_twins/pages/activities_list_page/activities_list_page_router.dart';
+import 'package:app_twins/pages/development_dash_page/development_dash_page_router.dart';
 import 'package:app_twins/pages/home_page/home_page_service.dart';
 import 'package:app_twins/pages/home_page/widgets/home_action_card.dart';
 import 'package:app_twins/pages/home_page/widgets/home_drawer_header.dart';
@@ -90,9 +90,9 @@ class _HomePageViewState extends State<HomePageView> {
         title: const Text(
           'Brinca+',
           style: TextStyle(
-            color: Color(0xFF1E2738),
-            fontWeight: FontWeight.w700,
-            fontSize: 17,
+            color: Color(0xFF101828),
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
           ),
         ),
       ),
@@ -148,9 +148,7 @@ class _HomePageViewState extends State<HomePageView> {
           title: 'Atividades',
           subtitle: 'Explore atividades offline para seus filhos',
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const OfflineActivitiesPage()),
-            );
+            ActivitiesListPageRouter.go(context);
           },
         ),
         const SizedBox(height: 14),
@@ -160,9 +158,7 @@ class _HomePageViewState extends State<HomePageView> {
           title: 'Desenvolvimento',
           subtitle: 'Acompanhe o progresso detalhado',
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const AdvancedDashboardPage()),
-            );
+            DevelopmentDashPageRouter.go(context);
           },
         ),
         const SizedBox(height: 14),
@@ -250,11 +246,7 @@ class _HomePageViewState extends State<HomePageView> {
                 label: 'Atividades',
                 onTap: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const OfflineActivitiesPage(),
-                    ),
-                  );
+                  ActivitiesListPageRouter.go(context);
                 },
               ),
               HomeDrawerItem(
@@ -262,11 +254,7 @@ class _HomePageViewState extends State<HomePageView> {
                 label: 'Relatorio de Desenvolvimento',
                 onTap: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const AdvancedDashboardPage(),
-                    ),
-                  );
+                  DevelopmentDashPageRouter.go(context);
                 },
               ),
               HomeDrawerItem(
