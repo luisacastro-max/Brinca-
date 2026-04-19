@@ -9,4 +9,5 @@ export 'auth/models/auth_models.dart';
 export 'users/users_api.dart';
 export 'children/children_api.dart';
 export 'activities/activities_api.dart';
+export 'completed_activities/completed_activities_api.dart';
 export 'plans/plans_api.dart';

@@ -97,6 +97,21 @@ class ServiceHttpClient {
     );
   }
 
+  Future<dynamic> patch(
+    String path, {
+    bool requiresAuth = false,
+    Map<String, dynamic>? body,
+    Map<String, dynamic>? query,
+  }) {
+    return _request(
+      'PATCH',
+      path,
+      requiresAuth: requiresAuth,
+      body: body,
+      query: query,
+    );
+  }
+
   Future<dynamic> _request(
     String method,
     String path, {
@@ -137,6 +152,11 @@ class ServiceHttpClient {
         case 'PUT':
           response = await _client
               .put(uri, headers: headers, body: encodedBody)
+              .timeout(const Duration(seconds: 20));
+          break;
+        case 'PATCH':
+          response = await _client
+              .patch(uri, headers: headers, body: encodedBody)
               .timeout(const Duration(seconds: 20));
           break;
         case 'DELETE':

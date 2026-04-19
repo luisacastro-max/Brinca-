@@ -3,6 +3,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum ActivityProgressState { notStarted, started, completed }
 
+class ActivityChildOption {
+  const ActivityChildOption({required this.id, required this.name});
+
+  final String id;
+  final String name;
+}
+
 class ActivityDetailsModel {
   const ActivityDetailsModel({
     required this.id,
@@ -43,13 +50,40 @@ class ActivityDetailsModel {
 }
 
 class ActivitiesPageService {
-  ActivitiesPageService({ActivitiesApi? activitiesApi})
-    : _activitiesApi = activitiesApi ?? ServiceSdk.instance.activities;
+  ActivitiesPageService({
+    ActivitiesApi? activitiesApi,
+    ChildrenApi? childrenApi,
+    CompletedActivitiesApi? completedActivitiesApi,
+  }) : _activitiesApi = activitiesApi ?? ServiceSdk.instance.activities,
+       _childrenApi = childrenApi ?? ServiceSdk.instance.children,
+       _completedActivitiesApi =
+           completedActivitiesApi ?? ServiceSdk.instance.completedActivities;
 
   final ActivitiesApi _activitiesApi;
+  final ChildrenApi _childrenApi;
+  final CompletedActivitiesApi _completedActivitiesApi;
 
   static const String _startedIdsKey = 'started_activity_ids';
   static const String _completedIdsKey = 'completed_activity_ids';
+  static const String _completedRecordIdsPrefix =
+      'started_completed_activity_record_ids_';
+
+  Future<List<ActivityChildOption>> loadChildrenOptions() async {
+    final children = await _childrenApi.getChildren();
+
+    final options = children
+        .map((item) {
+          final id = (item['_id'] ?? item['id'] ?? '').toString().trim();
+          final name = (item['name'] ?? 'Crianca').toString().trim();
+          if (id.isEmpty) return null;
+          return ActivityChildOption(id: id, name: name);
+        })
+        .whereType<ActivityChildOption>()
+        .toList();
+
+    options.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return options;
+  }
 
   Future<ActivityDetailsModel> loadActivity(String activityId) async {
     final json = await _activitiesApi.getActivityById(activityId);
@@ -115,12 +149,14 @@ class ActivitiesPageService {
 
   Future<ActivityProgressState> loadProgressState(String activityId) async {
     final prefs = await SharedPreferences.getInstance();
-    final completedIds = (prefs.getStringList(_completedIdsKey) ?? const <String>[]).toSet();
+    final completedIds =
+        (prefs.getStringList(_completedIdsKey) ?? const <String>[]).toSet();
     if (completedIds.contains(activityId)) {
       return ActivityProgressState.completed;
     }
 
-    final startedIds = (prefs.getStringList(_startedIdsKey) ?? const <String>[]).toSet();
+    final startedIds =
+        (prefs.getStringList(_startedIdsKey) ?? const <String>[]).toSet();
     if (startedIds.contains(activityId)) {
       return ActivityProgressState.started;
     }
@@ -128,31 +164,80 @@ class ActivitiesPageService {
     return ActivityProgressState.notStarted;
   }
 
-  Future<ActivityProgressState> advanceProgress(
-    String activityId,
-    ActivityProgressState current,
-  ) async {
+  Future<ActivityProgressState> startActivity({
+    required String activityId,
+    required List<String> childIds,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
-    final startedIds = (prefs.getStringList(_startedIdsKey) ?? const <String>[])
-        .toSet();
+    final startedIds =
+        (prefs.getStringList(_startedIdsKey) ?? const <String>[]).toSet();
     final completedIds =
         (prefs.getStringList(_completedIdsKey) ?? const <String>[]).toSet();
 
-    if (current == ActivityProgressState.notStarted) {
-      startedIds.add(activityId);
-      await prefs.setStringList(_startedIdsKey, startedIds.toList());
-      return ActivityProgressState.started;
+    final completedActivityIds = await _completedActivitiesApi.startActivity(
+      activityId: activityId,
+      childIds: childIds,
+    );
+
+    await prefs.setStringList(
+      '$_completedRecordIdsPrefix$activityId',
+      completedActivityIds,
+    );
+
+    startedIds.add(activityId);
+    completedIds.remove(activityId);
+
+    await prefs.setStringList(_startedIdsKey, startedIds.toList());
+    await prefs.setStringList(_completedIdsKey, completedIds.toList());
+
+    return ActivityProgressState.started;
+  }
+
+  Future<ActivityProgressState> completeActivity(String activityId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final startedIds =
+        (prefs.getStringList(_startedIdsKey) ?? const <String>[]).toSet();
+    final completedIds =
+        (prefs.getStringList(_completedIdsKey) ?? const <String>[]).toSet();
+
+    final completedActivityIds =
+        prefs.getStringList('$_completedRecordIdsPrefix$activityId') ??
+        const <String>[];
+
+    if (completedActivityIds.isEmpty) {
+      throw const ServiceException(
+        statusCode: 400,
+        message: 'Nao ha registros iniciados para concluir esta atividade.',
+      );
     }
 
-    if (current == ActivityProgressState.started) {
-      startedIds.remove(activityId);
-      completedIds.add(activityId);
-      await prefs.setStringList(_startedIdsKey, startedIds.toList());
-      await prefs.setStringList(_completedIdsKey, completedIds.toList());
-      return ActivityProgressState.completed;
-    }
+    await _completedActivitiesApi.completeActivities(
+      completedActivityIds: completedActivityIds,
+    );
+
+    startedIds.remove(activityId);
+    completedIds.add(activityId);
+
+    await prefs.setStringList(_startedIdsKey, startedIds.toList());
+    await prefs.setStringList(_completedIdsKey, completedIds.toList());
+    await prefs.remove('$_completedRecordIdsPrefix$activityId');
 
     return ActivityProgressState.completed;
+  }
+
+  Future<void> resetCompletedState(String activityId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final startedIds =
+        (prefs.getStringList(_startedIdsKey) ?? const <String>[]).toSet();
+    final completedIds =
+        (prefs.getStringList(_completedIdsKey) ?? const <String>[]).toSet();
+
+    startedIds.remove(activityId);
+    completedIds.remove(activityId);
+
+    await prefs.setStringList(_startedIdsKey, startedIds.toList());
+    await prefs.setStringList(_completedIdsKey, completedIds.toList());
+    await prefs.remove('$_completedRecordIdsPrefix$activityId');
   }
 
   List<String> _asStringList(dynamic value) {
