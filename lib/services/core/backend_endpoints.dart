@@ -14,4 +14,12 @@ class BackendEndpoints {
 
   static const String plans = '/api/plans';
   static String planById(String id) => '/api/plans/$id';
+
+  static const String completedActivities = '/api/completed-activities';
+  static const String completedActivitiesStart =
+      '/api/completed-activities/start';
+  static const String completedActivitiesComplete =
+      '/api/completed-activities/complete';
+  static String completedActivitiesByChild(String childId) =>
+      '/api/completed-activities/$childId/completed';
 }

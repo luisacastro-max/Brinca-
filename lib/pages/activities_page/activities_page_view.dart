@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:app_twins/pages/activities_page/activities_page_service.dart';
 import 'package:app_twins/pages/activities_page/widgets/activity_details_header.dart';
 import 'package:app_twins/pages/activities_page/widgets/activity_info_grid.dart';
@@ -6,6 +8,7 @@ import 'package:app_twins/pages/activities_page/widgets/adaptations_section.dart
 import 'package:app_twins/pages/activities_page/widgets/bullet_list_section.dart';
 import 'package:app_twins/pages/activities_page/widgets/neurodivergence_card.dart';
 import 'package:app_twins/pages/activities_page/widgets/steps_section.dart';
+import 'package:app_twins/services/service.dart';
 import 'package:flutter/material.dart';
 
 class ActivitiesPageView extends StatefulWidget {
@@ -24,11 +27,19 @@ class _ActivitiesPageViewState extends State<ActivitiesPageView> {
   String? _errorMessage;
   ActivityDetailsModel? _details;
   ActivityProgressState _progressState = ActivityProgressState.notStarted;
+  bool _isSubmittingProgress = false;
+  Timer? _resetProgressTimer;
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _resetProgressTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -38,50 +49,7 @@ class _ActivitiesPageViewState extends State<ActivitiesPageView> {
     });
 
     try {
-      final details = ActivityDetailsModel(
-        id: '1',
-        title: 'Caça ao Tesouro Sensorial',
-        description:
-            'Esconda objetos com texturas e aromas diferentes pela casa para os pequenos encontrarem usando apenas o tato e olfato.',
-        isFree: true,
-        durationLabel: '20-30 min',
-        ageLabel: '3-5 anos',
-        areaLabel: 'Habilidades Motoras',
-        difficulty: 'Fácil',
-        isNeurodivergentValid: true,
-        neuroDescription:
-            'Esta atividade é adequada para crianças neurodivergentes, pois permite adaptações e estimula diferentes áreas de desenvolvimento.',
-        whyImportant: [
-          'Desenvolve a percepção tátil e o reconhecimento de texturas',
-          'Estimula a concentração e atenção aos detalhes',
-          'Promove a exploração sensorial de forma lúdica',
-          'Reduz dependência de estímulos visuais digitais',
-        ],
-        materials: [
-          'Objetos de diferentes texturas (esponja, tecido, papel, plástico). Alternativa: Itens domésticos variados',
-          'Venda ou lenço para cobrir os olhos. Alternativa: Pedir que a criança feche os olhos',
-          'Cesta ou caixa para guardar os objetos',
-        ],
-        steps: [
-          'Selecione 5-8 objetos de texturas variadas pela casa. Dica: Escolha itens seguros e de tamanhos adequados para a idade.',
-          'Esconda os objetos em locais acessíveis do ambiente.',
-          'Vende os olhos da criança ou peça para fechá-los.',
-          'Guie a criança pela casa e incentive-a a explorar com as mãos. Dica: Use linguagem descritiva: Sente algo macio? Áspero? Liso?',
-          'Quando encontrar um objeto, peça para descrever a textura antes de ver.',
-          'Após todas as descobertas, conversem sobre as sensações experimentadas.',
-        ],
-        adaptations: [
-          'Para crianças mais novas (2-3 anos): Use apenas 3-4 objetos grandes e texturas bem distintas. Mantenha os olhos abertos e foque na exploração tátil.',
-          'Para crianças neurodivergentes: Permita que vejam os objetos primeiro. Respeite se não quiserem vendar os olhos. Foque no prazer da descoberta, não na competição.',
-          'Para grupos: Cada criança pode esconder objetos para as outras encontrarem, desenvolvendo cooperação e revezamento.',
-        ],
-        adultTips: [
-          'Observe quais texturas a criança prefere ou evita, isso pode indicar sensibilidades sensoriais',
-          'Não force a criança a tocar algo que ela demonstre desconforto',
-          'Celebre cada descoberta com entusiasmo genuíno',
-          'Use a atividade para expandir vocabulário sensorial',
-        ],
-      );
+      final details = await _service.loadActivity(widget.activityId);
 
       final progress = await _service.loadProgressState(widget.activityId);
 
@@ -99,9 +67,125 @@ class _ActivitiesPageViewState extends State<ActivitiesPageView> {
   }
 
   Future<void> _advanceProgress() async {
-    final next = await _service.advanceProgress(widget.activityId, _progressState);
-    if (!mounted) return;
-    setState(() => _progressState = next);
+    if (_isSubmittingProgress) return;
+
+    setState(() => _isSubmittingProgress = true);
+
+    try {
+      if (_progressState == ActivityProgressState.notStarted) {
+        final children = await _service.loadChildrenOptions();
+        if (!mounted) return;
+
+        if (children.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Cadastre uma crianca para iniciar.')),
+          );
+          return;
+        }
+
+        final selectedChildIds = await _showChildrenSelectionDialog(children);
+        if (!mounted || selectedChildIds == null || selectedChildIds.isEmpty) {
+          return;
+        }
+
+        final next = await _service.startActivity(
+          activityId: widget.activityId,
+          childIds: selectedChildIds,
+        );
+
+        if (!mounted) return;
+        setState(() => _progressState = next);
+        return;
+      }
+
+      if (_progressState == ActivityProgressState.started) {
+        final next = await _service.completeActivity(widget.activityId);
+        if (!mounted) return;
+        setState(() => _progressState = next);
+        _scheduleProgressReset();
+      }
+    } on ServiceException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nao foi possivel atualizar a atividade.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmittingProgress = false);
+      }
+    }
+  }
+
+  void _scheduleProgressReset() {
+    _resetProgressTimer?.cancel();
+    _resetProgressTimer = Timer(const Duration(seconds: 3), () async {
+      await _service.resetCompletedState(widget.activityId);
+      if (!mounted) return;
+      setState(() => _progressState = ActivityProgressState.notStarted);
+    });
+  }
+
+  Future<List<String>?> _showChildrenSelectionDialog(
+    List<ActivityChildOption> children,
+  ) {
+    final selectedIds = <String>{};
+
+    return showDialog<List<String>>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Selecionar criancas'),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: children
+                        .map(
+                          (child) => CheckboxListTile(
+                            value: selectedIds.contains(child.id),
+                            onChanged: (checked) {
+                              setDialogState(() {
+                                if (checked == true) {
+                                  selectedIds.add(child.id);
+                                } else {
+                                  selectedIds.remove(child.id);
+                                }
+                              });
+                            },
+                            title: Text(child.name),
+                            controlAffinity: ListTileControlAffinity.leading,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
+                  onPressed: selectedIds.isEmpty
+                      ? null
+                      : () => Navigator.of(context).pop(selectedIds.toList()),
+                  child: const Text('Iniciar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -191,39 +275,45 @@ class _ActivitiesPageViewState extends State<ActivitiesPageView> {
                       ),
                       const SizedBox(height: 12),
                       NeurodivergenceCard(),
-                      BulletListSection(
-                        title: 'Por que esta atividade importa',
-                        items: details.whyImportant,
-                        emptyMessage: 'Nenhuma informação disponível.',
-                        icon: Icons.lightbulb_outline,
-                        backgroundColor: const Color(0xFFF0FDF4),
+                      if (details.whyImportant.isNotEmpty)
+                        BulletListSection(
+                          title: 'Por que esta atividade importa',
+                          items: details.whyImportant,
+                          emptyMessage: 'Nenhuma informação disponível.',
+                          icon: Icons.lightbulb_outline,
+                          backgroundColor: const Color(0xFFF0FDF4),
                         iconColor: const Color(0xFF00A63E),
                       ),
-                      BulletListSection(
-                        title: 'Materiais Necessarios',
-                        items: details.materials,
-                        emptyMessage: 'Nenhum material especificado.',
-                        icon: Icons.inventory_2_outlined,
-                        backgroundColor: Colors.white,
+                      if (details.materials.isNotEmpty)
+                        BulletListSection(
+                          title: 'Materiais Necessarios',
+                          items: details.materials,
+                          emptyMessage: 'Nenhum material especificado.',
+                          icon: Icons.inventory_2_outlined,
+                          backgroundColor: Colors.white,
                         iconColor: const Color(0xFFF97316),
                       ),
-                      StepsSection(steps: details.steps),
-                      AdaptationsSection(
-                        title: 'Adaptacoes e alternativas',
-                        items: details.adaptations,
-                        emptyMessage: 'Nenhuma adaptação especificada.',
-                      ),
-                      BulletListSection(
-                        title: 'Dicas para adultos',
-                        items: details.adultTips,
-                        emptyMessage: 'Nenhuma dica especificada.',
-                        icon: Icons.info_outline,
+                      if (details.steps.isNotEmpty)
+                        StepsSection(steps: details.steps),
+                      if (details.adaptations.isNotEmpty)
+                        AdaptationsSection(
+                          title: 'Adaptacoes e alternativas',
+                          items: details.adaptations,
+                          emptyMessage: 'Nenhuma adaptação especificada.',
+                        ),
+                      if (details.adultTips.isNotEmpty)
+                        BulletListSection(
+                          title: 'Dicas para adultos',
+                          items: details.adultTips,
+                          emptyMessage: 'Nenhuma dica especificada.',
+                          icon: Icons.info_outline,
                         backgroundColor: const Color(0xFFEFF4FC),
                         iconColor: const Color(0xFF3B82F6),
                       ),
                       const SizedBox(height: 14),
                       ActivityPrimaryButton(
                         state: _progressState,
+                        isLoading: _isSubmittingProgress,
                         onPressed: _advanceProgress,
                       ),
                     ],
