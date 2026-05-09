@@ -6,7 +6,7 @@ class LoginPageService {
 
   final AuthApi _authApi;
 
-  Future<void> submit({
+  Future<BackendUser> submit({
     required String email,
     required String password,
   }) async {
@@ -17,6 +17,11 @@ class LoginPageService {
       );
     }
 
-    await _authApi.login(email: email, password: password);
+    final session = await _authApi.login(
+      email: email,
+      password: password,
+    );
+
+    return session.user;
   }
 }

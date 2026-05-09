@@ -8,6 +8,17 @@ class AuthApi {
 
   final ServiceHttpClient _httpClient;
 
+  String _normalizeUserType(String userType) {
+    final normalized = userType.trim().toUpperCase();
+    if (normalized != 'PARENT' && normalized != 'CLINIC') {
+      throw const ServiceException(
+        statusCode: 400,
+        message: 'userType invalido. Use PARENT ou CLINIC.',
+      );
+    }
+    return normalized;
+  }
+
   String _normalizeEmail(String email) {
     return email.trim().toLowerCase();
   }
@@ -45,8 +56,10 @@ class AuthApi {
     required String name,
     required String email,
     required String password,
+    required String userType,
   }) async {
     _validateRegisterInput(name: name, email: email, password: password);
+    final normalizedType = _normalizeUserType(userType);
 
     await _httpClient.post(
       BackendEndpoints.authRegister,
@@ -54,6 +67,7 @@ class AuthApi {
         'name': _normalizeName(name),
         'email': _normalizeEmail(email),
         'password': password,
+        'userType': normalizedType,
       },
     );
   }

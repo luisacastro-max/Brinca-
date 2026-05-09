@@ -2,11 +2,13 @@ class BackendUser {
   final String id;
   final String name;
   final String email;
+  final String userType;
 
   const BackendUser({
     required this.id,
     required this.name,
     required this.email,
+    required this.userType,
   });
 
   factory BackendUser.fromJson(Map<String, dynamic> json) {
@@ -14,6 +16,7 @@ class BackendUser {
       id: (json['id'] ?? json['_id'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),
       email: (json['email'] ?? '').toString(),
+      userType: (json['userType']).toString().toUpperCase(),
     );
   }
 
@@ -22,6 +25,7 @@ class BackendUser {
       'id': id,
       'name': name,
       'email': email,
+      'userType': userType,
     };
   }
 }

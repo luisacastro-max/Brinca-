@@ -6,16 +6,16 @@ class UsersApi {
 
   final ServiceHttpClient _httpClient;
 
-  Future<List<Map<String, dynamic>>> getUsers() async {
-    final response = await _httpClient.get(BackendEndpoints.users);
+  Future<Map<String, dynamic>?> getCurrentUserProfile() async {
+    final response = await _httpClient.get(
+      BackendEndpoints.usersMe,
+      requiresAuth: true,
+    );
 
-    if (response is List) {
-      return response
-          .whereType<Map>()
-          .map((item) => Map<String, dynamic>.from(item))
-          .toList();
+    if (response is Map<String, dynamic>) {
+      return response;
     }
 
-    return [];
+    return null;
   }
 }

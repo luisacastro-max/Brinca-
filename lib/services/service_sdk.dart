@@ -4,6 +4,7 @@ import 'package:app_twins/services/children/children_api.dart';
 import 'package:app_twins/services/completed_activities/completed_activities_api.dart';
 import 'package:app_twins/services/core/service_http_client.dart';
 import 'package:app_twins/services/plans/plans_api.dart';
+import 'package:app_twins/services/subscription_plans/subscription_plans_api.dart';
 import 'package:app_twins/services/users/users_api.dart';
 
 class ServiceSdk {
@@ -15,6 +16,7 @@ class ServiceSdk {
     activities = ActivitiesApi(_httpClient);
     completedActivities = CompletedActivitiesApi(_httpClient);
     plans = PlansApi(_httpClient);
+    subscriptionPlans = SubscriptionPlansApi(_httpClient);
   }
 
   static final ServiceSdk instance = ServiceSdk._internal();
@@ -27,6 +29,7 @@ class ServiceSdk {
   late final ActivitiesApi activities;
   late final CompletedActivitiesApi completedActivities;
   late final PlansApi plans;
+  late final SubscriptionPlansApi subscriptionPlans;
 
   Future<Map<String, dynamic>?> ping() async {
     final response = await _httpClient.get('/ping');

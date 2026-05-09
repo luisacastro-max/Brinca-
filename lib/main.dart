@@ -1,7 +1,12 @@
+import 'package:app_twins/pages/activities_list_page/activities_list_page_view.dart';
+import 'package:app_twins/pages/clinic_home_page/clinic_home_page_view.dart';
 import 'package:app_twins/pages/home_page/home_page_view.dart';
-import 'package:app_twins/pages/login_page/login_page_view.dart';
+import 'package:app_twins/pages/user_type_choice_page/user_type_choice_page_view.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:flutter/material.dart';
+
+import 'pages/activities_page/activities_page_view.dart';
+import 'pages/development_dash_page/development_dash_page_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,27 +36,31 @@ class AppSessionGate extends StatefulWidget {
 }
 
 class _AppSessionGateState extends State<AppSessionGate> {
-  late final Future<bool> _hasSessionFuture;
+  late final Future<BackendUser?> _currentUserFuture;
 
   @override
   void initState() {
     super.initState();
-    _hasSessionFuture = _hasValidSession();
+    _currentUserFuture = _loadCurrentUser();
   }
 
-  Future<bool> _hasValidSession() async {
+  Future<BackendUser?> _loadCurrentUser() async {
     final auth = ServiceSdk.instance.auth;
     final hasToken = await auth.isAuthenticated();
-    if (!hasToken) return false;
+    if (!hasToken) return null;
 
     final currentUser = await auth.getCurrentUser();
-    return currentUser != null && currentUser.id.trim().isNotEmpty;
+    if (currentUser == null || currentUser.id.trim().isEmpty) {
+      return null;
+    }
+
+    return currentUser;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _hasSessionFuture,
+    return FutureBuilder<BackendUser?>(
+      future: _currentUserFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
@@ -59,11 +68,16 @@ class _AppSessionGateState extends State<AppSessionGate> {
           );
         }
 
-        if (snapshot.data == true) {
+        final user = snapshot.data;
+        if (user != null) {
+          final userType = user.userType.trim().toUpperCase();
+          if (userType == 'CLINIC') {
+            return const ClinicHomePageView();
+          }
           return const HomePageView();
         }
 
-        return const LoginPageView();
+        return const UserTypeChoicePageView();
       },
     );
   }

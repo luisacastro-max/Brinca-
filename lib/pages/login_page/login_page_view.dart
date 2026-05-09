@@ -1,6 +1,7 @@
+import 'package:app_twins/pages/clinic_home_page/clinic_home_page_router.dart';
 import 'package:app_twins/pages/login_page/login_page_service.dart';
 import 'package:app_twins/pages/home_page/home_page_view.dart';
-import 'package:app_twins/pages/registration_page/registration_page_router.dart';
+import 'package:app_twins/pages/user_type_choice_page/user_type_choice_page_router.dart';
 import 'package:app_twins/widgets/auth_text_field.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:flutter/material.dart';
@@ -22,17 +23,22 @@ class _LoginPageViewState extends State<LoginPageView> {
     setState(() => _isLoading = true);
 
     try {
-      await _service.submit(
+      final user = await _service.submit(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
       if (!mounted) return;
       _showSnackBar('Login realizado com sucesso!', isError: false);
-      await Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomePageView()),
-        (_) => false,
-      );
+      final userType = user.userType.trim().toUpperCase();
+      if (userType == 'CLINIC') {
+        await ClinicHomePageRouter.goAndClearStack(context);
+      } else {
+        await Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomePageView()),
+          (_) => false,
+        );
+      }
     } on ServiceException catch (e) {
       if (!mounted) return;
       _showSnackBar(e.message);
@@ -175,7 +181,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                   const Text('Ainda não tem conta? '),
                   GestureDetector(
                     onTap: () {
-                      RegistrationPageRouter.go(context);
+                      UserTypeChoicePageRouter.goReplacement(context);
                     },
                     child: const Text(
                       'Cadastre-se',

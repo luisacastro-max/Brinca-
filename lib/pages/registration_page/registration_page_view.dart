@@ -1,10 +1,13 @@
 import 'package:app_twins/services/service.dart';
 import 'package:app_twins/pages/registration_page/registration_page_service.dart';
+import 'package:app_twins/pages/welcome_page/welcome_page_router.dart';
 import 'package:app_twins/widgets/auth_text_field.dart';
 import 'package:flutter/material.dart';
 
 class RegistrationPageView extends StatefulWidget {
-  const RegistrationPageView({super.key});
+  const RegistrationPageView({super.key, required this.userType});
+
+  final String userType;
 
   @override
   State<RegistrationPageView> createState() => _RegistrationPageViewState();
@@ -27,16 +30,17 @@ class _RegistrationPageViewState extends State<RegistrationPageView> {
         email: _emailController.text,
         password: _passwordController.text,
         confirmPassword: _confirmPasswordController.text,
+        userType: widget.userType,
       );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cadastro realizado com sucesso! Agora faca login.'),
+          content: Text('Cadastro realizado com sucesso!'),
           backgroundColor: Color(0xFF66C2B2),
         ),
       );
-      Navigator.of(context).pop();
+      await WelcomePageRouter.goAndClearStack(context);
     } on ServiceException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
