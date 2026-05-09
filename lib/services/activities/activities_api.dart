@@ -47,6 +47,7 @@ class ActivitiesApi {
   Future<Map<String, dynamic>> getActivityById(String activityId) async {
     final response = await _httpClient.get(
       BackendEndpoints.activityById(activityId),
+      requiresAuth: true,
     );
 
     if (response is Map<String, dynamic>) return response;

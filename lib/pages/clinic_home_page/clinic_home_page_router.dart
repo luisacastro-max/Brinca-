@@ -1,11 +1,10 @@
-import 'package:app_twins/pages/children_selection_page/children_selection_page_view.dart';
-import 'package:app_twins/pages/welcome_page/welcome_page_view.dart';
+import 'package:app_twins/pages/clinic_home_page/clinic_home_page_view.dart';
 import 'package:flutter/material.dart';
 
-class WelcomePageRouter {
+class ClinicHomePageRouter {
   static Route<void> route() {
     return MaterialPageRoute<void>(
-      builder: (_) => const WelcomePageView(),
+      builder: (_) => const ClinicHomePageView(),
     );
   }
 
@@ -19,13 +18,5 @@ class WelcomePageRouter {
 
   static Future<void> goAndClearStack(BuildContext context) {
     return Navigator.of(context).pushAndRemoveUntil(route(), (_) => false);
-  }
-
-  static Future<void> goToChildrenSelection(BuildContext context) {
-    return Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const ChildrenSelectionPageView(),
-      ),
-    );
   }
 }

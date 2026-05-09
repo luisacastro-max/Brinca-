@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BackendSessionStore {
   BackendSessionStore._();
@@ -21,13 +20,11 @@ class BackendSessionStore {
   }
 
   Future<void> saveUser(Map<String, dynamic> user) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userKey, jsonEncode(user));
+    await _secureStorage.write(key: _userKey, value: jsonEncode(user));
   }
 
   Future<Map<String, dynamic>?> getUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString(_userKey);
+    final userJson = await _secureStorage.read(key: _userKey);
     if (userJson == null || userJson.isEmpty) return null;
 
     try {
@@ -38,8 +35,7 @@ class BackendSessionStore {
   }
 
   Future<void> clear() async {
-    final prefs = await SharedPreferences.getInstance();
     await _secureStorage.delete(key: _tokenKey);
-    await prefs.remove(_userKey);
+    await _secureStorage.delete(key: _userKey);
   }
 }

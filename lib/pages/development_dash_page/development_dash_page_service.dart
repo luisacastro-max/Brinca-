@@ -70,7 +70,7 @@ class DevelopmentDashPageService {
   DevelopmentDashPageService({
     ChildrenApi? childrenApi,
     CompletedActivitiesApi? completedActivitiesApi,
-    bool useMocks = true,
+    bool useMocks = false,
   }) : _childrenApi = childrenApi ?? ServiceSdk.instance.children,
        _completedActivitiesApi =
            completedActivitiesApi ?? ServiceSdk.instance.completedActivities,

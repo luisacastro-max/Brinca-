@@ -6,6 +6,7 @@ import 'package:app_twins/pages/home_page/widgets/home_drawer_header.dart';
 import 'package:app_twins/pages/home_page/widgets/home_drawer_item.dart';
 import 'package:app_twins/pages/home_page/widgets/home_week_summary_card.dart';
 import 'package:app_twins/pages/login_page/login_page_router.dart';
+import 'package:app_twins/pages/premium_plans_page/premium_plans_page_router.dart';
 import 'package:app_twins/progress_dashboard_page.dart';
 import 'package:flutter/material.dart';
 
@@ -274,9 +275,7 @@ class _HomePageViewState extends State<HomePageView> {
                 label: 'Planos e Assinatura',
                 onTap: () {
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Tela em desenvolvimento.')),
-                  );
+                  PremiumPlansPageRouter.go(context);
                 },
               ),
               HomeDrawerItem(

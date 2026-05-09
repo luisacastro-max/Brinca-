@@ -11,3 +11,4 @@ export 'children/children_api.dart';
 export 'activities/activities_api.dart';
 export 'completed_activities/completed_activities_api.dart';
 export 'plans/plans_api.dart';
+export 'subscription_plans/subscription_plans_api.dart';
