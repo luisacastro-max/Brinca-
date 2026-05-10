@@ -8,6 +8,7 @@ import 'package:app_twins/pages/clinic_home_page/widgets/clinic_recent_activity_
 import 'package:app_twins/pages/home_page/widgets/home_drawer_header.dart';
 import 'package:app_twins/pages/home_page/widgets/home_drawer_item.dart';
 import 'package:app_twins/pages/login_page/login_page_router.dart';
+import 'package:app_twins/pages/patient_management_page/patient_management_page_router.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:flutter/material.dart';
 
@@ -281,7 +282,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
         ClinicQuickActionCard(
           title: 'Gerenciar Pacientes',
           subtitle: 'Ver lista completa e detalhes',
-          onTap: () => ChildrenListPageRouter.go(context),
+          onTap: () => PatientManagementPageRouter.go(context),
         ),
         const SizedBox(height: 16),
         ClinicQuickActionCard(
@@ -415,7 +416,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
                 label: 'Gerenciar Pacientes',
                 onTap: () {
                   Navigator.of(context).pop();
-                  ChildrenListPageRouter.go(context);
+                  PatientManagementPageRouter.go(context);
                 },
               ),
               HomeDrawerItem(
