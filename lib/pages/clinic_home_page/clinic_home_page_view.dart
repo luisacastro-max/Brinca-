@@ -9,6 +9,7 @@ import 'package:app_twins/pages/home_page/widgets/home_drawer_header.dart';
 import 'package:app_twins/pages/home_page/widgets/home_drawer_item.dart';
 import 'package:app_twins/pages/login_page/login_page_router.dart';
 import 'package:app_twins/pages/patient_management_page/patient_management_page_router.dart';
+import 'package:app_twins/pages/recommend_page_page/recommend_page_router.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:flutter/material.dart';
 
@@ -288,7 +289,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
         ClinicQuickActionCard(
           title: 'Recomendar Atividades',
           subtitle: 'Enviar sugestoes personalizadas',
-          onTap: () => ActivitiesListPageRouter.go(context),
+          onTap: () => RecommendPageRouter.go(context),
         ),
         const SizedBox(height: 16),
         ClinicQuickActionCard(
@@ -424,7 +425,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
                 label: 'Recomendar Atividades',
                 onTap: () {
                   Navigator.of(context).pop();
-                  ActivitiesListPageRouter.go(context);
+                  RecommendPageRouter.go(context);
                 },
               ),
               HomeDrawerItem(
