@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:app_twins/api_config.dart';
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,22 @@ import 'package:http/http.dart' as http;
 
 import 'service_exception.dart';
 import 'backend_session_store.dart';
+
+class HttpBinaryResponse {
+  HttpBinaryResponse({
+    required this.bytes,
+    required this.contentType,
+    this.fileName,
+    required this.statusCode,
+    required this.headers,
+  });
+
+  final Uint8List bytes;
+  final String contentType;
+  final String? fileName;
+  final int statusCode;
+  final Map<String, String> headers;
+}
 
 class ServiceHttpClient {
   ServiceHttpClient({
@@ -112,6 +129,65 @@ class ServiceHttpClient {
     );
   }
 
+  Future<HttpBinaryResponse> getBytes(
+    String path, {
+    bool requiresAuth = false,
+    Map<String, dynamic>? query,
+  }) async {
+    final token = await _sessionStore.getToken();
+    if (requiresAuth && (token == null || token.isEmpty)) {
+      throw const ServiceException(
+        statusCode: 401,
+        message: 'Sessao nao autenticada para esta operacao.',
+      );
+    }
+
+    final uri = _buildUri(path, query: query);
+    final headers = <String, String>{
+      'Accept': 'application/pdf,application/octet-stream',
+      if (requiresAuth) 'Authorization': 'Bearer $token',
+    };
+
+    http.Response response;
+    try {
+      response = await _client
+          .get(uri, headers: headers)
+          .timeout(const Duration(seconds: 45));
+    } on TimeoutException {
+      throw const ServiceException(
+        statusCode: 408,
+        message: 'Tempo de requisicao esgotado.',
+      );
+    } catch (e) {
+      throw ServiceException(
+        statusCode: 0,
+        message: 'Falha de conexao com o servidor.',
+        details: kDebugMode ? e.toString() : null,
+      );
+    }
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final decoded = _parseBody(utf8.decode(response.bodyBytes, allowMalformed: true));
+      throw ServiceException(
+        statusCode: response.statusCode,
+        message: _extractErrorMessage(decoded, response.statusCode),
+        details: kDebugMode ? decoded : null,
+      );
+    }
+
+    final normalizedHeaders = response.headers.map(
+      (key, value) => MapEntry(key.toLowerCase(), value),
+    );
+
+    return HttpBinaryResponse(
+      bytes: response.bodyBytes,
+      contentType: normalizedHeaders['content-type'] ?? 'application/octet-stream',
+      fileName: _extractFileName(normalizedHeaders['content-disposition']),
+      statusCode: response.statusCode,
+      headers: normalizedHeaders,
+    );
+  }
+
   Future<dynamic> _request(
     String method,
     String path, {
@@ -188,7 +264,7 @@ class ServiceHttpClient {
       return parsedBody;
     }
 
-    if (response.statusCode == 401) {
+    if (response.statusCode == 401 && requiresAuth) {
       await _sessionStore.clear();
     }
 
@@ -236,5 +312,17 @@ class ServiceHttpClient {
     }
 
     return 'Erro HTTP $statusCode';
+  }
+
+  String? _extractFileName(String? contentDisposition) {
+    if (contentDisposition == null || contentDisposition.isEmpty) return null;
+
+    final starMatch = RegExp(r"filename\*=UTF-8''([^;]+)", caseSensitive: false).firstMatch(contentDisposition);
+    if (starMatch != null) {
+      return Uri.decodeComponent(starMatch.group(1) ?? '');
+    }
+
+    final regularMatch = RegExp(r'filename="?([^";]+)"?', caseSensitive: false).firstMatch(contentDisposition);
+    return regularMatch?.group(1);
   }
 }

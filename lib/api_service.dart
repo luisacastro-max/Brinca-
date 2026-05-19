@@ -18,7 +18,6 @@ class ApiService {
         throw Exception('Falha ao carregar dados: ${response.statusCode}');
       }
     } catch (e) {
-      print('Erro na requisição: $e');
       return null;
     }
   }

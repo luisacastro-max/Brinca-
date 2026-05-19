@@ -17,9 +17,14 @@ class BackendEndpoints {
 
   static const String subscriptionPlans = '/api/subscription-plans';
   static String subscriptionPlanPaymentIntent(String planId) => '/api/subscription-plans/$planId/payment-intent';
+  static String subscriptionPlanCheckoutSession(String planId) => '/api/subscription-plans/$planId/checkout-session';
+  static const String subscriptionPlanActivate = '/api/subscription-plans/activate';
 
   static const String completedActivities = '/api/completed-activities';
   static const String completedActivitiesStart = '/api/completed-activities/start';
   static const String completedActivitiesComplete = '/api/completed-activities/complete';
   static String completedActivitiesByChild(String childId) => '/api/completed-activities/$childId/completed';
+
+  static const String reportsParent = '/api/reports/parent';
+  static const String reportsClinic = '/api/reports/clinic';
 }

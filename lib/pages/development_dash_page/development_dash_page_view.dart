@@ -6,6 +6,8 @@ import 'package:app_twins/pages/development_dash_page/widgets/development_donut_
 import 'package:app_twins/pages/development_dash_page/widgets/development_history_table_card.dart';
 import 'package:app_twins/pages/development_dash_page/widgets/development_line_chart_card.dart';
 import 'package:app_twins/pages/development_dash_page/widgets/development_metric_card.dart';
+import 'package:app_twins/services/reports/reports_export_service.dart';
+import 'package:app_twins/services/service.dart';
 import 'package:flutter/material.dart';
 
 class DevelopmentDashPageView extends StatefulWidget {
@@ -18,6 +20,7 @@ class DevelopmentDashPageView extends StatefulWidget {
 
 class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
   final DevelopmentDashPageService _service = DevelopmentDashPageService();
+  final ReportsExportService _reportsExportService = ReportsExportService();
 
   bool _isLoading = true;
   String? _errorMessage;
@@ -28,6 +31,7 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
   DevelopmentDashMockScenario? _selectedScenario =
       DevelopmentDashMockScenario.manyActivities;
   DevelopmentDashData? _data;
+  bool _reportActionInProgress = false;
 
   @override
   void initState() {
@@ -227,6 +231,13 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
                         period: _selectedPeriod,
                         onChildChanged: _onChildChanged,
                         onPeriodChanged: _onPeriodChanged,
+                        onDownloadTap: () => _handleParentReportAction(
+                          share: false,
+                        ),
+                        onShareTap: () => _handleParentReportAction(
+                          share: true,
+                        ),
+                        reportActionInProgress: _reportActionInProgress,
                       ),
                       const SizedBox(height: 10),
                       _buildScenarioSelector(),
@@ -378,5 +389,87 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
     if (score > 50) return const Color(0xFF0F9D58);
     if (score < 50) return const Color(0xFFE4572E);
     return const Color(0xFF6A7282);
+  }
+
+  Future<void> _handleParentReportAction({required bool share}) async {
+    final childId = _selectedChildId;
+    if (childId == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Selecione uma crianca para exportar o relatorio.'),
+        ),
+      );
+      return;
+    }
+
+    if (_reportActionInProgress) return;
+
+    setState(() => _reportActionInProgress = true);
+
+    try {
+      final periodQuery = _periodQueryParams(_selectedPeriod);
+      final report = await _reportsExportService.fetchParentReport(
+        childId: childId,
+        period: periodQuery.$1,
+        startDate: periodQuery.$2,
+        endDate: periodQuery.$3,
+      );
+
+      if (share) {
+        await _reportsExportService.shareReport(
+          report,
+          text: 'Relatorio de acompanhamento Brinca+',
+        );
+      } else {
+        await _reportsExportService.saveReport(report);
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            share
+                ? 'Relatorio pronto para compartilhamento.'
+                : 'Relatorio exportado com sucesso.',
+          ),
+        ),
+      );
+    } on ServiceException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nao foi possivel exportar o relatorio.'),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _reportActionInProgress = false);
+    }
+  }
+
+  (String, String?, String?) _periodQueryParams(DevelopmentDashPeriod period) {
+    switch (period) {
+      case DevelopmentDashPeriod.lastWeek:
+        return ('lastWeek', null, null);
+      case DevelopmentDashPeriod.lastMonth:
+        return ('lastMonth', null, null);
+      case DevelopmentDashPeriod.lastTwoWeeks:
+        final now = DateTime.now();
+        final start = now.subtract(const Duration(days: 13));
+        return (
+          'custom',
+          _toIsoDate(start),
+          _toIsoDate(now),
+        );
+    }
+  }
+
+  String _toIsoDate(DateTime date) {
+    return date.toIso8601String().split('T').first;
   }
 }

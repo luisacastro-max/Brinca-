@@ -41,42 +41,52 @@ class ActivityListItemCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    spacing: 8,
-                    children: [
-                      Text(
-                        item.title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF101828),
-                          height: 1.15,
+                  Expanded(
+                    child: Row(
+                      spacing: 8,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF101828),
+                              height: 1.15,
+                            ),
+                          ),
                         ),
-                      ),
-                      _priceBadge(),
-                    ],
+                        _priceBadge(),
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: onToggleSaved,
-                        visualDensity: VisualDensity.compact,
-                        icon: Icon(
-                          saved ? Icons.favorite : Icons.favorite_border,
-                          color: saved
-                              ? const Color(0xFFE11D48)
-                              : const Color(0xFF98A2B3),
-                          size: 22,
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 72,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          onPressed: onToggleSaved,
+                          visualDensity: VisualDensity.compact,
+                          icon: Icon(
+                            saved ? Icons.favorite : Icons.favorite_border,
+                            color: saved
+                                ? const Color(0xFFE11D48)
+                                : const Color(0xFF98A2B3),
+                            size: 22,
+                          ),
                         ),
-                      ),
-                      const Icon(
-                        Icons.chevron_right,
-                        color: Color(0xFF98A2B3),
-                        size: 32,
-                      ),
-                    ],
+                        const Icon(
+                          Icons.chevron_right,
+                          color: Color(0xFF98A2B3),
+                          size: 32,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -90,19 +100,18 @@ class ActivityListItemCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Row(
+              Wrap(
                 spacing: 8,
+                runSpacing: 8,
                 children: [
                   _metaItem(Icons.schedule_outlined, item.durationLabel),
                   _metaItem(
                     Icons.family_restroom_outlined,
-                    _formatAgeRange(item.ageRange),
+                    _formatAgeLabel(item.ageLabel),
                   ),
+                  _chip(item.areaLabel),
                   _chip(item.difficulty),
-                  if (item.isNeurodivergenceValid) ...[
-                    const SizedBox(height: 10),
-                    _neuroChip(),
-                  ],
+                  if (item.isNeurodivergenceValid) _neuroChip(),
                 ],
               ),
             ],
@@ -186,7 +195,7 @@ class ActivityListItemCard extends StatelessWidget {
           Icon(Icons.psychology_outlined, size: 14, color: Color(0xFF432DD7)),
           SizedBox(width: 6),
           Text(
-            'Validada para\nneurodivergência',
+            'Validada para neurodivergência',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -199,14 +208,7 @@ class ActivityListItemCard extends StatelessWidget {
     );
   }
 
-  String _formatAgeRange(String value) {
-    if (value.contains('-')) {
-      final parts = value.split('-');
-      if (parts.length == 2) {
-        return '${parts[0]}-${parts[1]} anos';
-      }
-    }
-
+  String _formatAgeLabel(String value) {
     if (value.trim().isEmpty) {
       return 'Nao informado';
     }
