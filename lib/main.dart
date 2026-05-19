@@ -1,12 +1,12 @@
-import 'package:app_twins/pages/activities_list_page/activities_list_page_view.dart';
 import 'package:app_twins/pages/clinic_home_page/clinic_home_page_view.dart';
 import 'package:app_twins/pages/home_page/home_page_view.dart';
+import 'package:app_twins/pages/login_page/login_page_view.dart';
 import 'package:app_twins/pages/user_type_choice_page/user_type_choice_page_view.dart';
+import 'package:app_twins/services/core/backend_session_store.dart';
+import 'package:app_twins/services/core/service_exception.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:flutter/material.dart';
 
-import 'pages/activities_page/activities_page_view.dart';
-import 'pages/development_dash_page/development_dash_page_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,31 +36,54 @@ class AppSessionGate extends StatefulWidget {
 }
 
 class _AppSessionGateState extends State<AppSessionGate> {
-  late final Future<BackendUser?> _currentUserFuture;
+  late final Future<_SessionGateResult> _sessionFuture;
 
   @override
   void initState() {
     super.initState();
-    _currentUserFuture = _loadCurrentUser();
+    _sessionFuture = _resolveSession();
   }
 
-  Future<BackendUser?> _loadCurrentUser() async {
+  Future<_SessionGateResult> _resolveSession() async {
     final auth = ServiceSdk.instance.auth;
     final hasToken = await auth.isAuthenticated();
-    if (!hasToken) return null;
-
-    final currentUser = await auth.getCurrentUser();
-    if (currentUser == null || currentUser.id.trim().isEmpty) {
-      return null;
+    if (!hasToken) {
+      return const _SessionGateResult.noSession();
     }
 
-    return currentUser;
+    try {
+      final profile = await ServiceSdk.instance.users.getCurrentUserProfile();
+      if (profile == null) {
+        await auth.logout();
+        return const _SessionGateResult.invalidToken();
+      }
+
+      await BackendSessionStore.instance.saveUser(profile);
+      return _SessionGateResult.valid(
+        BackendUser.fromJson(profile),
+      );
+    } on ServiceException catch (e) {
+      if (e.statusCode == 401 || e.statusCode == 403) {
+        await auth.logout();
+        return const _SessionGateResult.invalidToken();
+      }
+
+      final fallbackUser = await auth.getCurrentUser();
+      if (fallbackUser != null && fallbackUser.id.trim().isNotEmpty) {
+        return _SessionGateResult.valid(fallbackUser);
+      }
+
+      return const _SessionGateResult.noSession();
+    } catch (_) {
+      await auth.logout();
+      return const _SessionGateResult.invalidToken();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<BackendUser?>(
-      future: _currentUserFuture,
+    return FutureBuilder<_SessionGateResult>(
+      future: _sessionFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
@@ -68,7 +91,13 @@ class _AppSessionGateState extends State<AppSessionGate> {
           );
         }
 
-        final user = snapshot.data;
+        final result = snapshot.data ?? const _SessionGateResult.noSession();
+        final user = result.user;
+
+        if (result.redirectToLogin) {
+          return const LoginPageView();
+        }
+
         if (user != null) {
           final userType = user.userType.trim().toUpperCase();
           if (userType == 'CLINIC') {
@@ -81,4 +110,26 @@ class _AppSessionGateState extends State<AppSessionGate> {
       },
     );
   }
+}
+
+class _SessionGateResult {
+  const _SessionGateResult({
+    required this.user,
+    required this.redirectToLogin,
+  });
+
+  const _SessionGateResult.valid(BackendUser value)
+    : user = value,
+      redirectToLogin = false;
+
+  const _SessionGateResult.noSession()
+    : user = null,
+      redirectToLogin = false;
+
+  const _SessionGateResult.invalidToken()
+    : user = null,
+      redirectToLogin = true;
+
+  final BackendUser? user;
+  final bool redirectToLogin;
 }

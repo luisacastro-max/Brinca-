@@ -1,5 +1,4 @@
 import 'package:app_twins/pages/activities_list_page/activities_list_page_router.dart';
-import 'package:app_twins/pages/children_list_page/children_list_page_router.dart';
 import 'package:app_twins/pages/clinic_home_page/clinic_home_page_service.dart';
 import 'package:app_twins/pages/clinic_home_page/widgets/clinic_attention_item_tile.dart';
 import 'package:app_twins/pages/clinic_home_page/widgets/clinic_metric_card.dart';
@@ -22,6 +21,7 @@ class ClinicHomePageView extends StatefulWidget {
 
 class _ClinicHomePageViewState extends State<ClinicHomePageView> {
   final ClinicHomePageService _service = ClinicHomePageService();
+  final ReportsExportService _reportsExportService = ReportsExportService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool _isLoading = true;
@@ -295,7 +295,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
         ClinicQuickActionCard(
           title: 'Gerar Relatorios',
           subtitle: 'Exportar dados e analises',
-          onTap: () {},
+          onTap: _openClinicReportActions,
         ),
       ],
     );
@@ -433,9 +433,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
                 label: 'Gerar Relatorios',
                 onTap: () {
                   Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Tela em desenvolvimento.')),
-                  );
+                  _openClinicReportActions();
                 },
               ),
               const Spacer(),
@@ -476,5 +474,167 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
     if (delta > 0) return '+$delta%';
     if (delta < 0) return '$delta%';
     return '0%';
+  }
+
+  Future<void> _openClinicReportActions() async {
+    var selectedPeriod = 'thisMonth';
+    var loading = false;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            Future<void> runAction({required bool share}) async {
+              if (loading) return;
+
+              setSheetState(() => loading = true);
+              try {
+                final report = await _reportsExportService.fetchClinicReport(
+                  period: selectedPeriod,
+                );
+
+                if (share) {
+                  await _reportsExportService.shareReport(
+                    report,
+                    text: 'Relatorio clinico Brinca+',
+                  );
+                } else {
+                  await _reportsExportService.saveReport(report);
+                }
+
+                if (!mounted) return;
+                Navigator.of(sheetContext).pop();
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      share
+                          ? 'Relatorio clinico pronto para compartilhamento.'
+                          : 'Relatorio clinico exportado com sucesso.',
+                    ),
+                  ),
+                );
+              } on ServiceException catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  SnackBar(content: Text(e.message)),
+                );
+              } catch (_) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Nao foi possivel gerar o relatorio clinico.'),
+                  ),
+                );
+              } finally {
+                if (sheetContext.mounted) {
+                  setSheetState(() => loading = false);
+                }
+              }
+            }
+
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                16 + MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Gerar Relatorio Clinico',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF101828),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Selecione o periodo para exportar os dados.',
+                    style: TextStyle(color: Color(0xFF4A5565)),
+                  ),
+                  const SizedBox(height: 14),
+                  DropdownButtonFormField<String>(
+                    value: selectedPeriod,
+                    decoration: InputDecoration(
+                      labelText: 'Periodo',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'lastWeek',
+                        child: Text('Ultima semana'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'thisMonth',
+                        child: Text('Mes atual'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'lastMonth',
+                        child: Text('Ultimo mes'),
+                      ),
+                    ],
+                    onChanged: loading
+                        ? null
+                        : (value) {
+                            if (value == null) return;
+                            setSheetState(() => selectedPeriod = value);
+                          },
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: loading
+                              ? null
+                              : () => runAction(share: false),
+                          icon: const Icon(Icons.download_outlined),
+                          label: const Text('Exportar'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: loading
+                              ? null
+                              : () => runAction(share: true),
+                          icon: loading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.share_outlined),
+                          label: Text(loading ? 'Gerando...' : 'Compartilhar'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

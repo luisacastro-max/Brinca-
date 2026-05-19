@@ -17,6 +17,7 @@ class _RecommendPagePageViewState extends State<RecommendPagePageView> {
   final RecommendPagePageService _service = RecommendPagePageService();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
+  static const int _pageSize = 10;
 
   bool _isLoading = true;
   String? _errorMessage;
@@ -27,6 +28,7 @@ class _RecommendPagePageViewState extends State<RecommendPagePageView> {
 
   String _searchTerm = '';
   Set<String> _selectedObjectives = <String>{};
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -54,6 +56,7 @@ class _RecommendPagePageViewState extends State<RecommendPagePageView> {
         _allActivities = data.activities;
         _patients = data.patients;
         _objectiveFilters = data.objectiveFilters;
+        _currentPage = 0;
       });
     } on ServiceException catch (e) {
       if (!mounted) return;
@@ -76,8 +79,6 @@ class _RecommendPagePageViewState extends State<RecommendPagePageView> {
 
   @override
   Widget build(BuildContext context) {
-    final visibleActivities = _filteredActivities();
-
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF3F4F6),
@@ -108,12 +109,15 @@ class _RecommendPagePageViewState extends State<RecommendPagePageView> {
       ),
       body: RefreshIndicator(
         onRefresh: _load,
-        child: _buildBody(visibleActivities),
+        child: _buildBody(),
       ),
     );
   }
 
-  Widget _buildBody(List<RecommendActivityItem> visibleActivities) {
+  Widget _buildBody() {
+    final filteredActivities = _filteredActivities();
+    final visibleActivities = _pagedActivities;
+
     if (_isLoading && _allActivities.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -167,17 +171,29 @@ class _RecommendPagePageViewState extends State<RecommendPagePageView> {
         RecommendFiltersPanel(
           searchController: _searchController,
           onSearchChanged: (value) {
-            setState(() => _searchTerm = value);
+            setState(() {
+              _searchTerm = value;
+              _currentPage = 0;
+              _clampCurrentPage();
+            });
           },
           selectedObjectives: _selectedObjectives,
           onObjectivesChanged: (values) {
-            setState(() => _selectedObjectives = values);
+            setState(() {
+              _selectedObjectives = values;
+              _currentPage = 0;
+              _clampCurrentPage();
+            });
           },
-          onClearObjectives: () => setState(() => _selectedObjectives = <String>{}),
+          onClearObjectives: () => setState(() {
+            _selectedObjectives = <String>{};
+            _currentPage = 0;
+            _clampCurrentPage();
+          }),
           availableObjectives: _objectiveFilters,
         ),
         const SizedBox(height: 32),
-        if (visibleActivities.isEmpty)
+        if (filteredActivities.isEmpty)
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -202,10 +218,42 @@ class _RecommendPagePageViewState extends State<RecommendPagePageView> {
                 if (i < visibleActivities.length - 1)
                   const SizedBox(height: 16),
               ],
+              const SizedBox(height: 16),
+              _buildPagination(),
             ],
           ),
       ],
     );
+  }
+
+  int get _totalPages {
+    final total = _filteredActivities().length;
+    if (total == 0) return 0;
+    return (total / _pageSize).ceil();
+  }
+
+  List<RecommendActivityItem> get _pagedActivities {
+    final items = _filteredActivities();
+    if (items.isEmpty) return const <RecommendActivityItem>[];
+
+    final start = _currentPage * _pageSize;
+    final safeStart = start.clamp(0, items.length);
+    final end = (safeStart + _pageSize).clamp(0, items.length);
+    return items.sublist(safeStart, end);
+  }
+
+  void _clampCurrentPage() {
+    final pages = _totalPages;
+    if (pages == 0) {
+      _currentPage = 0;
+      return;
+    }
+    if (_currentPage >= pages) {
+      _currentPage = pages - 1;
+    }
+    if (_currentPage < 0) {
+      _currentPage = 0;
+    }
   }
 
   Future<void> _onSelectActivity(RecommendActivityItem item) async {
@@ -256,5 +304,88 @@ class _RecommendPagePageViewState extends State<RecommendPagePageView> {
 
       return searchOk && objectiveOk;
     }).toList();
+  }
+
+  Widget _buildPagination() {
+    final pages = _totalPages;
+    if (pages <= 1) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFFFF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE4E7EC), width: 1.2),
+      ),
+      child: Row(
+        children: [
+          _paginationIconButton(
+            icon: Icons.chevron_left,
+            enabled: _currentPage > 0,
+            onTap: () => setState(() {
+              _currentPage -= 1;
+              _clampCurrentPage();
+            }),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Container(
+              height: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'Página ${_currentPage + 1} de $pages',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF344054),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          _paginationIconButton(
+            icon: Icons.chevron_right,
+            enabled: _currentPage < pages - 1,
+            onTap: () => setState(() {
+              _currentPage += 1;
+              _clampCurrentPage();
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _paginationIconButton({
+    required IconData icon,
+    required bool enabled,
+    required VoidCallback onTap,
+  }) {
+    final backgroundColor = enabled
+        ? const Color(0xFFF3F4F6)
+        : const Color(0xFFE5E7EB);
+    final iconColor = enabled
+        ? const Color(0xFF364153)
+        : const Color(0xFF98A2B3);
+
+    return Material(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: enabled ? onTap : null,
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Icon(icon, size: 20, color: iconColor),
+        ),
+      ),
+    );
   }
 }

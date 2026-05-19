@@ -9,6 +9,9 @@ class DevelopmentDashFilters extends StatelessWidget {
     required this.period,
     required this.onChildChanged,
     required this.onPeriodChanged,
+    required this.onDownloadTap,
+    required this.onShareTap,
+    this.reportActionInProgress = false,
   });
 
   final List<DevelopmentChildOption> children;
@@ -16,6 +19,9 @@ class DevelopmentDashFilters extends StatelessWidget {
   final DevelopmentDashPeriod period;
   final ValueChanged<String?> onChildChanged;
   final ValueChanged<DevelopmentDashPeriod> onPeriodChanged;
+  final VoidCallback onDownloadTap;
+  final VoidCallback onShareTap;
+  final bool reportActionInProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -183,30 +189,57 @@ class DevelopmentDashFilters extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            _squareAction(Icons.download_outlined),
+            _squareAction(
+              Icons.download_outlined,
+              onTap: onDownloadTap,
+              disabled: reportActionInProgress,
+            ),
             const SizedBox(width: 8),
-            _squareAction(Icons.share_outlined, active: true),
+            _squareAction(
+              Icons.share_outlined,
+              onTap: onShareTap,
+              active: true,
+              disabled: reportActionInProgress,
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _squareAction(IconData icon, {bool active = false}) {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: active ? const Color(0xFF8B2CF5) : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: active ? const Color(0xFF8B2CF5) : const Color(0xFFD0D5DD),
+  Widget _squareAction(
+    IconData icon, {
+    required VoidCallback onTap,
+    bool active = false,
+    bool disabled = false,
+  }) {
+    final color = active ? const Color(0xFF8B2CF5) : const Color(0xFFF8FAFC);
+    final borderColor = active
+        ? const Color(0xFF8B2CF5)
+        : const Color(0xFFD0D5DD);
+
+    return Opacity(
+      opacity: disabled ? 0.6 : 1,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: disabled ? null : onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor),
+            ),
+            child: Icon(
+              icon,
+              size: 18,
+              color: active ? Colors.white : const Color(0xFF344054),
+            ),
+          ),
         ),
-      ),
-      child: Icon(
-        icon,
-        size: 18,
-        color: active ? Colors.white : const Color(0xFF344054),
       ),
     );
   }

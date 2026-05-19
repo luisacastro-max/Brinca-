@@ -23,6 +23,30 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
   void initState() {
     super.initState();
     _loadPlans();
+    _processWebCheckoutReturn();
+  }
+
+  Future<void> _processWebCheckoutReturn() async {
+    try {
+      final message = await _service.processWebCheckoutReturn();
+      if (!mounted || message == null || message.isEmpty) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } on ServiceException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nao foi possivel validar o retorno do checkout.'),
+        ),
+      );
+    }
   }
 
   Future<void> _loadPlans() async {

@@ -7,7 +7,8 @@ class ActivityListItem {
     required this.title,
     required this.description,
     required this.durationLabel,
-    required this.ageRange,
+    required this.ageLabel,
+    required this.areaLabel,
     required this.difficulty,
     required this.isNeurodivergenceValid,
     required this.isFree,
@@ -17,7 +18,8 @@ class ActivityListItem {
   final String title;
   final String description;
   final String durationLabel;
-  final String ageRange;
+  final String ageLabel;
+  final String areaLabel;
   final String difficulty;
   final bool isNeurodivergenceValid;
   final bool isFree;
@@ -27,25 +29,45 @@ class ActivitiesListPageData {
   const ActivitiesListPageData({
     required this.activities,
     required this.savedActivityIds,
+    required this.isCurrentUserPremium,
   });
 
   final List<ActivityListItem> activities;
   final Set<String> savedActivityIds;
+  final bool isCurrentUserPremium;
 }
 
 class ActivitiesListPageService {
-  ActivitiesListPageService({ActivitiesApi? activitiesApi})
-    : _activitiesApi = activitiesApi ?? ServiceSdk.instance.activities;
+  ActivitiesListPageService({
+    ActivitiesApi? activitiesApi,
+    UsersApi? usersApi,
+  }) : _activitiesApi = activitiesApi ?? ServiceSdk.instance.activities,
+       _usersApi = usersApi ?? ServiceSdk.instance.users;
 
   final ActivitiesApi _activitiesApi;
+  final UsersApi _usersApi;
   static const String _savedIdsKey = 'saved_activity_ids';
 
   Future<ActivitiesListPageData> loadPageData() async {
     final activitiesJson = await _activitiesApi.getActivities();
     final savedIds = await loadSavedActivityIds();
+    final isCurrentUserPremium = await _loadCurrentUserPremium();
 
     final items = activitiesJson.map(_mapFromApi).toList();
-    return ActivitiesListPageData(activities: items, savedActivityIds: savedIds);
+    return ActivitiesListPageData(
+      activities: items,
+      savedActivityIds: savedIds,
+      isCurrentUserPremium: isCurrentUserPremium,
+    );
+  }
+
+  Future<bool> _loadCurrentUserPremium() async {
+    try {
+      final profile = await _usersApi.getCurrentUserProfile();
+      return _asBool(profile?['isPremium']);
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<Set<String>> loadSavedActivityIds() async {
@@ -73,13 +95,30 @@ class ActivitiesListPageService {
     final title = (json['title'] ?? 'Atividade sem titulo').toString();
     final description = (json['description'] ?? '').toString();
 
-    final duration = _parseDuration(json['durationMinutes']);
-    final durationLabel = '$duration min';
+    final durationLabel = _readString(
+      json,
+      keys: const ['durationLabel'],
+      fallback: _legacyDurationLabel(json['durationMinutes']),
+    );
+    final ageLabel = _readString(
+      json,
+      keys: const ['ageLabel', 'ageRange'],
+      fallback: 'Nao informado',
+    );
+    final areaLabel = _readString(
+      json,
+      keys: const ['areaLabel'],
+      fallback: 'Sem area',
+    );
+    final difficulty = _readString(
+      json,
+      keys: const ['difficulty'],
+      fallback: 'Nao informado',
+    );
 
-    final ageRange = (json['ageRange'] ?? 'Nao informado').toString();
-    final difficulty = (json['difficulty'] ?? 'Nao informado').toString();
-
-    final isNeurodivergenceValid = _asBool(json['neurodivergenceValidated']);
+    final isNeurodivergenceValid = _asBool(
+      json['isNeurodivergentValid'] ?? json['neurodivergenceValidated'],
+    );
 
     final isFree = _asBool(json['isFree']);
 
@@ -88,11 +127,31 @@ class ActivitiesListPageService {
       title: title,
       description: description,
       durationLabel: durationLabel,
-      ageRange: ageRange,
+      ageLabel: ageLabel,
+      areaLabel: areaLabel,
       difficulty: difficulty,
       isNeurodivergenceValid: isNeurodivergenceValid,
       isFree: isFree,
     );
+  }
+
+  String _legacyDurationLabel(dynamic value) {
+    final duration = _parseDuration(value);
+    return '$duration min';
+  }
+
+  String _readString(
+    Map<String, dynamic> json, {
+    required List<String> keys,
+    required String fallback,
+  }) {
+    for (final key in keys) {
+      final value = json[key];
+      if (value == null) continue;
+      final text = value.toString().trim();
+      if (text.isNotEmpty) return text;
+    }
+    return fallback;
   }
 
   int _parseDuration(dynamic value) {
