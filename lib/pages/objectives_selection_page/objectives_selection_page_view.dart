@@ -2,9 +2,11 @@ import 'package:app_twins/children_option.dart';
 import 'package:app_twins/design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
 import 'package:app_twins/design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
 import 'package:app_twins/model/onboarding_child_model.dart';
-import 'package:app_twins/pages/children_list_page/children_list_page_router.dart';
+import 'package:app_twins/pages/clinic_home_page/clinic_home_page_router.dart';
+import 'package:app_twins/pages/home_page/home_page_router.dart';
 import 'package:app_twins/pages/objectives_selection_page/objectives_selection_page_router.dart';
 import 'package:app_twins/pages/objectives_selection_page/objectives_selection_page_service.dart';
+import 'package:app_twins/services/service.dart';
 import 'package:app_twins/theme/theme_data_base.dart';
 import 'package:flutter/material.dart';
 
@@ -104,7 +106,16 @@ class _ObjectivesSelectionPageViewState extends State<ObjectivesSelectionPageVie
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Perfil criado com sucesso!')),
       );
-      await ChildrenListPageRouter.goAndClearStack(context);
+
+      final currentUser = await ServiceSdk.instance.auth.getCurrentUser();
+      if (!mounted) return;
+
+      final userType = (currentUser?.userType ?? '').trim().toUpperCase();
+      if (userType == 'CLINIC') {
+        await ClinicHomePageRouter.goAndClearStack(context);
+      } else {
+        await HomePageRouter.goAndClearStack(context);
+      }
     } on Exception catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

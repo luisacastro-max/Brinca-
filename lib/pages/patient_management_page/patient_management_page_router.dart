@@ -16,6 +16,10 @@ class PatientManagementPageRouter {
     return Navigator.of(context).pushReplacement(route());
   }
 
+  static Future<void> goAndClearStack(BuildContext context) {
+    return Navigator.of(context).pushAndRemoveUntil(route(), (_) => false);
+  }
+
   static void goBack(BuildContext context) {
     Navigator.of(context).pop();
   }

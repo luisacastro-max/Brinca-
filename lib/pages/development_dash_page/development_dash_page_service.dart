@@ -277,6 +277,14 @@ class DevelopmentDashPageService {
     final activityMap = Map<String, dynamic>.from(activity);
     final areas = <String>{};
 
+    final areaLabel = (activityMap['areaLabel'] ?? '').toString().trim();
+    if (areaLabel.isNotEmpty) {
+      final mapped = _areaFromText(areaLabel);
+      if (mapped != null) {
+        areas.add(mapped);
+      }
+    }
+
     final goals = activityMap['developmentGoals'];
     if (goals is List) {
       for (final goal in goals) {

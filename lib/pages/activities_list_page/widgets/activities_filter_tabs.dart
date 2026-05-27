@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum ActivitiesFilterType { all, saved }
+enum ActivitiesFilterType { recommended, all, saved }
 
 class ActivitiesFilterTabs extends StatelessWidget {
   const ActivitiesFilterTabs({
@@ -26,15 +26,15 @@ class ActivitiesFilterTabs extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           _buildButton(
-            label: 'Todas',
-            active: selected == ActivitiesFilterType.all,
-            onTap: () => onChanged(ActivitiesFilterType.all),
+            label: 'Recomendadas',
+            active: selected == ActivitiesFilterType.recommended,
+            onTap: () => onChanged(ActivitiesFilterType.recommended),
           ),
           const SizedBox(width: 8),
           _buildButton(
-            label: 'Desenvolvimento Emocional',
-            active: false,
-            onTap: () {},
+            label: 'Todas',
+            active: selected == ActivitiesFilterType.all,
+            onTap: () => onChanged(ActivitiesFilterType.all),
           ),
         ],
       ),

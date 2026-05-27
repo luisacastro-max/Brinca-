@@ -274,7 +274,10 @@ class _ActivitiesPageViewState extends State<ActivitiesPageView> {
                         difficulty: details.difficulty,
                       ),
                       const SizedBox(height: 12),
-                      NeurodivergenceCard(),
+                      if (details.isNeurodivergentValid)
+                        NeurodivergenceCard(
+                          description: details.neuroDescription,
+                        ),
                       if (details.whyImportant.isNotEmpty)
                         BulletListSection(
                           title: 'Por que esta atividade importa',

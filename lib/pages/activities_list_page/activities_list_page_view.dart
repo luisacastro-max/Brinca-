@@ -19,10 +19,12 @@ class _ActivitiesListPageViewState extends State<ActivitiesListPageView> {
 
   bool _isLoading = true;
   String? _errorMessage;
-  ActivitiesFilterType _filter = ActivitiesFilterType.all;
+  ActivitiesFilterType _filter = ActivitiesFilterType.recommended;
   int _currentPage = 0;
 
   List<ActivityListItem> _activities = const <ActivityListItem>[];
+  List<ActivitiesChildOption> _children = const <ActivitiesChildOption>[];
+  String? _selectedChildId;
   Set<String> _savedIds = <String>{};
   bool _isCurrentUserPremium = false;
 
@@ -43,6 +45,16 @@ class _ActivitiesListPageViewState extends State<ActivitiesListPageView> {
       if (!mounted) return;
       setState(() {
         _activities = data.activities;
+        _children = data.children;
+        if (_children.isEmpty) {
+          _selectedChildId = null;
+        } else {
+          final hasCurrentSelection = _selectedChildId != null &&
+              _children.any((child) => child.id == _selectedChildId);
+          _selectedChildId = hasCurrentSelection
+              ? _selectedChildId
+              : _children.first.id;
+        }
         _savedIds = data.savedActivityIds;
         _isCurrentUserPremium = data.isCurrentUserPremium;
         _currentPage = 0;
@@ -99,10 +111,24 @@ class _ActivitiesListPageViewState extends State<ActivitiesListPageView> {
   }
 
   List<ActivityListItem> get _filteredActivities {
+    final selectedChild = _children.where((child) => child.id == _selectedChildId).firstOrNull;
+
+    final shouldApplyAgeFilter = _filter != ActivitiesFilterType.all;
+
+    var filtered = _activities.where((item) {
+      if (!shouldApplyAgeFilter) return true;
+      if (selectedChild == null) return true;
+      return _isChildAgeCompatible(
+        childAgeRangeCode: selectedChild.ageRangeCode,
+        activityAgeLabel: item.ageLabel,
+      );
+    }).toList();
+
     if (_filter == ActivitiesFilterType.saved) {
-      return _activities.where((item) => _savedIds.contains(item.id)).toList();
+      filtered = filtered.where((item) => _savedIds.contains(item.id)).toList();
     }
-    return _activities;
+
+    return filtered;
   }
 
   int get _totalPages {
@@ -165,6 +191,13 @@ class _ActivitiesListPageViewState extends State<ActivitiesListPageView> {
           children: [
             ActivitiesPageHeader(
               selectedFilter: _filter,
+              children: _children,
+              selectedChildId: _selectedChildId,
+              onChildChanged: (value) => setState(() {
+                _selectedChildId = value;
+                _currentPage = 0;
+                _clampCurrentPage();
+              }),
               onFilterChanged: (value) => setState(() {
                 _filter = value;
                 _currentPage = 0;
@@ -319,5 +352,76 @@ class _ActivitiesListPageViewState extends State<ActivitiesListPageView> {
         ),
       ),
     );
+  }
+
+  bool _isChildAgeCompatible({
+    required String childAgeRangeCode,
+    required String activityAgeLabel,
+  }) {
+    final childRange = _extractRange(childAgeRangeCode);
+    final activityRange = _extractRange(activityAgeLabel);
+
+    if (childRange == null || activityRange == null) return true;
+
+    return childRange.$1 <= activityRange.$2 &&
+        childRange.$2 >= activityRange.$1;
+  }
+
+  (int, int)? _extractRange(String input) {
+    final normalized = input.trim().toLowerCase();
+    if (normalized.isEmpty) return null;
+
+    const yearToMonths = 12;
+    final hasMonths = RegExp(r'mes|m[eê]s').hasMatch(normalized);
+    final hasYears = RegExp(r'ano').hasMatch(normalized);
+    final defaultIsMonths = hasMonths && !hasYears;
+
+    int toMonths(int value, {required bool isMonths}) {
+      return isMonths ? value : value * yearToMonths;
+    }
+
+    final explicitUnitMatches = RegExp(
+      r'(\d+)\s*(anos?|ano|meses?|m[eê]s)',
+    ).allMatches(normalized);
+
+    final explicitValuesInMonths = <int>[];
+    for (final match in explicitUnitMatches) {
+      final rawValue = match.group(1);
+      final unit = (match.group(2) ?? '').toLowerCase();
+      final value = int.tryParse(rawValue ?? '');
+      if (value == null) continue;
+      final isMonths = unit.contains('mes') || unit.contains('mês');
+      explicitValuesInMonths.add(toMonths(value, isMonths: isMonths));
+    }
+
+    final numericMatches = RegExp(r'(\d+)').allMatches(normalized).toList();
+    final numericValues = numericMatches
+        .map((match) => int.tryParse(match.group(1) ?? ''))
+        .whereType<int>()
+        .toList();
+
+    if (explicitValuesInMonths.length >= 2) {
+      final first = explicitValuesInMonths[0];
+      final second = explicitValuesInMonths[1];
+      return first <= second ? (first, second) : (second, first);
+    }
+
+    if (numericValues.length >= 2) {
+      final first = toMonths(numericValues[0], isMonths: defaultIsMonths);
+      final second = toMonths(numericValues[1], isMonths: defaultIsMonths);
+      return first <= second ? (first, second) : (second, first);
+    }
+
+    if (explicitValuesInMonths.length == 1) {
+      final value = explicitValuesInMonths.first;
+      return (value, value);
+    }
+
+    if (numericValues.length == 1) {
+      final value = toMonths(numericValues.first, isMonths: defaultIsMonths);
+      return (value, value);
+    }
+
+    return null;
   }
 }

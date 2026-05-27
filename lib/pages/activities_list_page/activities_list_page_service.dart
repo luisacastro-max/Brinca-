@@ -25,40 +25,99 @@ class ActivityListItem {
   final bool isFree;
 }
 
+class ActivitiesChildOption {
+  const ActivitiesChildOption({
+    required this.id,
+    required this.name,
+    required this.ageRangeCode,
+    required this.ageLabel,
+    required this.initial,
+  });
+
+  final String id;
+  final String name;
+  final String ageRangeCode;
+  final String ageLabel;
+  final String initial;
+}
+
 class ActivitiesListPageData {
   const ActivitiesListPageData({
     required this.activities,
     required this.savedActivityIds,
     required this.isCurrentUserPremium,
+    required this.children,
   });
 
   final List<ActivityListItem> activities;
   final Set<String> savedActivityIds;
   final bool isCurrentUserPremium;
+  final List<ActivitiesChildOption> children;
 }
 
 class ActivitiesListPageService {
   ActivitiesListPageService({
     ActivitiesApi? activitiesApi,
     UsersApi? usersApi,
+    ChildrenApi? childrenApi,
   }) : _activitiesApi = activitiesApi ?? ServiceSdk.instance.activities,
-       _usersApi = usersApi ?? ServiceSdk.instance.users;
+       _usersApi = usersApi ?? ServiceSdk.instance.users,
+       _childrenApi = childrenApi ?? ServiceSdk.instance.children;
 
   final ActivitiesApi _activitiesApi;
   final UsersApi _usersApi;
+  final ChildrenApi _childrenApi;
   static const String _savedIdsKey = 'saved_activity_ids';
 
   Future<ActivitiesListPageData> loadPageData() async {
     final activitiesJson = await _activitiesApi.getActivities();
+    print('activitiesJson: $activitiesJson');
     final savedIds = await loadSavedActivityIds();
     final isCurrentUserPremium = await _loadCurrentUserPremium();
+    final children = await _loadChildren();
 
     final items = activitiesJson.map(_mapFromApi).toList();
     return ActivitiesListPageData(
       activities: items,
       savedActivityIds: savedIds,
       isCurrentUserPremium: isCurrentUserPremium,
+      children: children,
     );
+  }
+
+  Future<List<ActivitiesChildOption>> _loadChildren() async {
+    try {
+      final childrenJson = await _childrenApi.getChildren();
+      final children = childrenJson
+          .map((json) {
+            final id = (json['_id'] ?? json['id'] ?? '').toString().trim();
+            if (id.isEmpty) return null;
+
+            final name = (json['name'] ?? 'Crianca').toString().trim();
+            final ageRangeCode = (json['ageRange'] ?? '').toString().trim();
+            return ActivitiesChildOption(
+              id: id,
+              name: name,
+              ageRangeCode: ageRangeCode,
+              ageLabel: _ageRangeToLabel(ageRangeCode),
+              initial: name.isEmpty ? 'C' : name.substring(0, 1).toUpperCase(),
+            );
+          })
+          .whereType<ActivitiesChildOption>()
+          .toList();
+
+      children.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      return children;
+    } catch (_) {
+      return const <ActivitiesChildOption>[];
+    }
+  }
+
+  String _ageRangeToLabel(String ageRangeCode) {
+    final code = ageRangeCode.trim();
+    if (code.isEmpty) return 'Sem idade';
+    if (RegExp(r'[a-zA-Z]').hasMatch(code)) return code;
+    return '$code anos';
   }
 
   Future<bool> _loadCurrentUserPremium() async {
