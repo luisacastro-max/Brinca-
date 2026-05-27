@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class NeurodivergenceCard extends StatelessWidget {
-  const NeurodivergenceCard({super.key});
+  const NeurodivergenceCard({
+    super.key,
+    required this.description,
+  });
+
+  final String description;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +52,7 @@ class NeurodivergenceCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 7),
                 Text(
-                  'Esta atividade mostrou maior engajamento e respostas positivas entre crianças neurodivergentes, baseado em testes com clínicas de psicologia parceiras.',
+                  description,
                   style: const TextStyle(
                     fontSize: 14,
                     color: Color(0xFF364153),

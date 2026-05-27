@@ -120,25 +120,38 @@ class ActivitiesPageService {
       _asStringList(json['tips']),
     ]);
 
-    final durationMinutes = _asInt(json['durationMinutes']);
-    final ageRange = (json['ageRange'] ?? '').toString();
+    final durationLabel = _firstText([
+      json['durationLabel'],
+      _legacyDurationLabel(json['durationMinutes']),
+    ]);
+    final ageLabel = _firstText([
+      json['ageLabel'],
+      _formatAgeRange((json['ageRange'] ?? '').toString()),
+    ]);
+    final areaLabel = _firstText([
+      json['areaLabel'],
+      goals.isEmpty ? '' : goals.first,
+      'Nao informado',
+    ]);
+    final neuroDescription = _firstText([
+      json['neuroDescription'],
+      json['neurodivergenceDescription'],
+      'Sem observacoes especificas para neurodivergencia.',
+    ]);
 
     return ActivityDetailsModel(
       id: (json['_id'] ?? json['id'] ?? '').toString(),
       title: (json['title'] ?? 'Atividade').toString(),
       description: (json['description'] ?? 'Sem descricao.').toString(),
       isFree: _asBool(json['isFree']),
-      durationLabel: durationMinutes <= 0
-          ? 'Nao informado'
-          : '$durationMinutes min',
-      ageLabel: _formatAgeRange(ageRange),
-      areaLabel: goals.isEmpty ? 'Nao informado' : goals.first,
+      durationLabel: durationLabel,
+      ageLabel: ageLabel,
+      areaLabel: areaLabel,
       difficulty: (json['difficulty'] ?? 'Nao informado').toString(),
-      isNeurodivergentValid: _asBool(json['neurodivergenceValidated']),
-      neuroDescription:
-          (json['neurodivergenceDescription'] ??
-                  'Sem observacoes especificas para neurodivergencia.')
-              .toString(),
+      isNeurodivergentValid: _asBool(
+        json['isNeurodivergentValid'] ?? json['neurodivergenceValidated'],
+      ),
+      neuroDescription: neuroDescription,
       whyImportant: whyImportant,
       materials: materials,
       steps: steps,
@@ -269,6 +282,19 @@ class ActivitiesPageService {
       if (list.isNotEmpty) return list;
     }
     return const <String>[];
+  }
+
+  String _firstText(List<dynamic> values) {
+    for (final value in values) {
+      final text = (value ?? '').toString().trim();
+      if (text.isNotEmpty) return text;
+    }
+    return 'Nao informado';
+  }
+
+  String _legacyDurationLabel(dynamic value) {
+    final durationMinutes = _asInt(value);
+    return durationMinutes <= 0 ? 'Nao informado' : '$durationMinutes min';
   }
 
   int _asInt(dynamic value) {
