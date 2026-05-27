@@ -71,7 +71,6 @@ class ActivitiesListPageService {
 
   Future<ActivitiesListPageData> loadPageData() async {
     final activitiesJson = await _activitiesApi.getActivities();
-    print('activitiesJson: $activitiesJson');
     final savedIds = await loadSavedActivityIds();
     final isCurrentUserPremium = await _loadCurrentUserPremium();
     final children = await _loadChildren();
