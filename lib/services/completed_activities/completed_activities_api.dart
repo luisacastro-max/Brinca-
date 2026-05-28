@@ -71,4 +71,23 @@ class CompletedActivitiesApi {
       message: 'Resposta invalida ao buscar atividades concluidas.',
     );
   }
+
+  Future<int> getCompletedActivitiesThisWeek() async {
+    final response = await _httpClient.get(
+      BackendEndpoints.completedActivitiesThisWeekSummary,
+      requiresAuth: true,
+    );
+
+    if (response is! Map<String, dynamic>) {
+      throw const ServiceException(
+        statusCode: 500,
+        message: 'Resposta invalida ao buscar resumo semanal.',
+      );
+    }
+
+    final rawValue = response['completedActivitiesThisWeek'];
+    if (rawValue is int) return rawValue;
+    if (rawValue is num) return rawValue.toInt();
+    return int.tryParse(rawValue?.toString() ?? '') ?? 0;
+  }
 }

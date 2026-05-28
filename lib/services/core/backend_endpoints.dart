@@ -23,6 +23,7 @@ class BackendEndpoints {
   static const String completedActivities = '/api/completed-activities';
   static const String completedActivitiesStart = '/api/completed-activities/start';
   static const String completedActivitiesComplete = '/api/completed-activities/complete';
+  static const String completedActivitiesThisWeekSummary = '/api/completed-activities/summary/this-week';
   static String completedActivitiesByChild(String childId) => '/api/completed-activities/$childId/completed';
 
   static const String reportsParent = '/api/reports/parent';

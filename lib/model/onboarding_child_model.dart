@@ -36,4 +36,28 @@ class OnboardingChildModel {
       interests: interests ?? List<String>.from(this.interests),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'ageOptionIndex': ageOptionIndex,
+      'timeOptionIndex': timeOptionIndex,
+      'developmentGoals': List<String>.from(developmentGoals),
+      'interests': List<String>.from(interests),
+    };
+  }
+
+  factory OnboardingChildModel.fromJson(Map<String, dynamic> json) {
+    return OnboardingChildModel(
+      name: (json['name'] ?? '').toString(),
+      ageOptionIndex: json['ageOptionIndex'] as int?,
+      timeOptionIndex: json['timeOptionIndex'] as int?,
+      developmentGoals: (json['developmentGoals'] as List<dynamic>? ?? const [])
+          .map((item) => item.toString())
+          .toList(),
+      interests: (json['interests'] as List<dynamic>? ?? const [])
+          .map((item) => item.toString())
+          .toList(),
+    );
+  }
 }

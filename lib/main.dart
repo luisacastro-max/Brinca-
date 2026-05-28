@@ -1,3 +1,4 @@
+import 'package:app_twins/pages/premium_plans_page/premium_plans_page_view.dart';
 import 'package:app_twins/pages/clinic_home_page/clinic_home_page_view.dart';
 import 'package:app_twins/pages/home_page/home_page_view.dart';
 import 'package:app_twins/pages/login_page/login_page_view.dart';
@@ -99,6 +100,10 @@ class _AppSessionGateState extends State<AppSessionGate> {
         }
 
         if (user != null) {
+          if (Uri.base.queryParameters.containsKey('checkout_result')) {
+            return const PremiumPlansPageView();
+          }
+
           final userType = user.userType.trim().toUpperCase();
           if (userType == 'CLINIC') {
             return const ClinicHomePageView();
