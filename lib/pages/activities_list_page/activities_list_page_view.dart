@@ -3,7 +3,10 @@ import 'package:app_twins/pages/activities_page/activities_page_router.dart';
 import 'package:app_twins/pages/activities_list_page/widgets/activities_filter_tabs.dart';
 import 'package:app_twins/pages/activities_list_page/widgets/activities_page_header.dart';
 import 'package:app_twins/pages/activities_list_page/widgets/activity_list_item_card.dart';
+import 'package:app_twins/pages/children_selection_page/children_selection_page_router.dart';
 import 'package:app_twins/pages/premium_plans_page/premium_plans_page_router.dart';
+import 'package:app_twins/services/service.dart';
+import 'package:app_twins/widgets/free_plan_limit_dialog.dart';
 import 'package:flutter/material.dart';
 
 class ActivitiesListPageView extends StatefulWidget {
@@ -110,6 +113,26 @@ class _ActivitiesListPageViewState extends State<ActivitiesListPageView> {
     });
   }
 
+  Future<void> _handleAddChildPressed() async {
+    final currentUser = await ServiceSdk.instance.auth.getCurrentUser();
+    if (!mounted) return;
+
+    final isCurrentUserPremium = currentUser?.isPremium ?? false;
+    final mustBlockByFreePlan = !isCurrentUserPremium && _children.isNotEmpty;
+
+    if (mustBlockByFreePlan) {
+      final action = await showFreePlanLimitDialog(context);
+      if (!mounted) return;
+
+      if (action == FreePlanDialogAction.openPlans) {
+        await PremiumPlansPageRouter.go(context);
+      }
+      return;
+    }
+
+    await ChildrenSelectionPageRouter.go(context);
+  }
+
   List<ActivityListItem> get _filteredActivities {
     final selectedChild = _children.where((child) => child.id == _selectedChildId).firstOrNull;
 
@@ -193,6 +216,7 @@ class _ActivitiesListPageViewState extends State<ActivitiesListPageView> {
               selectedFilter: _filter,
               children: _children,
               selectedChildId: _selectedChildId,
+              onAddChildPressed: _handleAddChildPressed,
               onChildChanged: (value) => setState(() {
                 _selectedChildId = value;
                 _currentPage = 0;
