@@ -10,6 +10,7 @@ import 'package:app_twins/pages/objectives_selection_page/objectives_selection_p
 import 'package:app_twins/pages/premium_plans_page/premium_plans_page_router.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:app_twins/theme/theme_data_base.dart';
+import 'package:app_twins/widgets/free_plan_limit_dialog.dart';
 import 'package:flutter/material.dart';
 
 class ObjectivesSelectionPageView extends StatefulWidget {
@@ -112,12 +113,12 @@ class _ObjectivesSelectionPageViewState extends State<ObjectivesSelectionPageVie
         final action = await _showFreePlanLimitDialog();
         if (!mounted) return;
 
-        if (action == _FreePlanDialogAction.openPlans) {
+        if (action == FreePlanDialogAction.openPlans) {
           await PremiumPlansPageRouter.go(
             context,
             pendingChildrenDrafts: widget.childrenDrafts,
           );
-        } else if (action == _FreePlanDialogAction.backToStart) {
+        } else if (action == FreePlanDialogAction.backToStart) {
           await Navigator.of(context).pushAndRemoveUntil(
             ChildrenSelectionPageRouter.route(),
             (_) => false,
@@ -149,27 +150,8 @@ class _ObjectivesSelectionPageViewState extends State<ObjectivesSelectionPageVie
     }
   }
 
-  Future<_FreePlanDialogAction?> _showFreePlanLimitDialog() {
-    return showDialog<_FreePlanDialogAction>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Limite do plano free'),
-        content: const Text(
-          'No plano free, voce pode cadastrar apenas 1 crianca. Para cadastrar mais de 1 crianca, adquira um plano premium.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(_FreePlanDialogAction.backToStart),
-            child: const Text('Voltar para o inicio'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(_FreePlanDialogAction.openPlans),
-            child: const Text('Ver planos'),
-          ),
-        ],
-      ),
-    );
+  Future<FreePlanDialogAction?> _showFreePlanLimitDialog() {
+    return showFreePlanLimitDialog(context);
   }
 
   @override
@@ -322,5 +304,3 @@ class _ObjectivesSelectionPageViewState extends State<ObjectivesSelectionPageVie
     );
   }
 }
-
-enum _FreePlanDialogAction { openPlans, backToStart }

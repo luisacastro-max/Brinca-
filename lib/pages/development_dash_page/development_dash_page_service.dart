@@ -1,7 +1,5 @@
 import 'package:app_twins/services/service.dart';
 
-import 'development_dash_mocks.dart';
-
 class DevelopmentChildOption {
   const DevelopmentChildOption({
     required this.id,
@@ -70,24 +68,15 @@ class DevelopmentDashPageService {
   DevelopmentDashPageService({
     ChildrenApi? childrenApi,
     CompletedActivitiesApi? completedActivitiesApi,
-    bool useMocks = false,
   }) : _childrenApi = childrenApi ?? ServiceSdk.instance.children,
        _completedActivitiesApi =
-           completedActivitiesApi ?? ServiceSdk.instance.completedActivities,
-       _useMocks = useMocks;
+           completedActivitiesApi ?? ServiceSdk.instance.completedActivities;
 
   final ChildrenApi _childrenApi;
   final CompletedActivitiesApi _completedActivitiesApi;
-  final bool _useMocks;
-
-  List<DevelopmentDashMockScenario> availableMockScenarios() {
-    return DevelopmentDashMockScenario.values;
-  }
 
   Future<List<DevelopmentChildOption>> loadChildren() async {
-    final children = _useMocks
-        ? DevelopmentDashMocks.children()
-        : await _childrenApi.getChildren();
+    final children = await _childrenApi.getChildren();
 
     return children
         .map((item) {
@@ -108,15 +97,10 @@ class DevelopmentDashPageService {
   Future<DevelopmentDashData> loadDashboard({
     required String childId,
     required DevelopmentDashPeriod period,
-    DevelopmentDashMockScenario scenario =
-        DevelopmentDashMockScenario.manyActivities,
   }) async {
-    final completedRecords = _useMocks
-        ? DevelopmentDashMocks.completedRecords(
-            childId: childId,
-            scenario: scenario,
-          )
-        : await _completedActivitiesApi.getCompletedByChild(childId);
+    final completedRecords = await _completedActivitiesApi.getCompletedByChild(
+      childId,
+    );
 
     if (completedRecords.isEmpty) return _emptyData(period);
 

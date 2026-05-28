@@ -1,12 +1,10 @@
 import 'package:app_twins/pages/development_dash_page/development_dash_page_service.dart';
-import 'package:app_twins/pages/development_dash_page/development_dash_mocks.dart';
 import 'package:app_twins/pages/development_dash_page/widgets/development_bar_chart_card.dart';
 import 'package:app_twins/pages/development_dash_page/widgets/development_dash_filters.dart';
 import 'package:app_twins/pages/development_dash_page/widgets/development_donut_chart_card.dart';
 import 'package:app_twins/pages/development_dash_page/widgets/development_history_table_card.dart';
 import 'package:app_twins/pages/development_dash_page/widgets/development_line_chart_card.dart';
 import 'package:app_twins/pages/development_dash_page/widgets/development_metric_card.dart';
-import 'package:app_twins/services/reports/reports_export_service.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:flutter/material.dart';
 
@@ -28,8 +26,6 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
   List<DevelopmentChildOption> _children = const [];
   String? _selectedChildId;
   DevelopmentDashPeriod _selectedPeriod = DevelopmentDashPeriod.lastWeek;
-  DevelopmentDashMockScenario? _selectedScenario =
-      DevelopmentDashMockScenario.manyActivities;
   DevelopmentDashData? _data;
   bool _reportActionInProgress = false;
 
@@ -63,8 +59,6 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
       final data = await _service.loadDashboard(
         childId: selectedId,
         period: _selectedPeriod,
-        scenario:
-            _selectedScenario ?? DevelopmentDashMockScenario.manyActivities,
       );
 
       if (!mounted) return;
@@ -94,8 +88,6 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
       final data = await _service.loadDashboard(
         childId: childId,
         period: _selectedPeriod,
-        scenario:
-            _selectedScenario ?? DevelopmentDashMockScenario.manyActivities,
       );
       if (!mounted) return;
       setState(() => _data = data);
@@ -116,13 +108,6 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
   Future<void> _onPeriodChanged(DevelopmentDashPeriod period) async {
     if (period == _selectedPeriod) return;
     setState(() => _selectedPeriod = period);
-    await _refreshDashboard();
-  }
-
-  Future<void> _onScenarioChanged(DevelopmentDashMockScenario? scenario) async {
-    if (scenario == null) return;
-    if (scenario == _selectedScenario) return;
-    setState(() => _selectedScenario = scenario);
     await _refreshDashboard();
   }
 
@@ -239,8 +224,6 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
                         ),
                         reportActionInProgress: _reportActionInProgress,
                       ),
-                      const SizedBox(height: 10),
-                      _buildScenarioSelector(),
                       const SizedBox(height: 12),
                     ],
                   ),
@@ -331,50 +314,6 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Color(0xFF3A4558)),
         onPressed: () => Navigator.of(context).pop(),
-      ),
-    );
-  }
-
-  Widget _buildScenarioSelector() {
-    final scenarios = _service.availableMockScenarios();
-    final selected =
-      _selectedScenario != null && scenarios.contains(_selectedScenario)
-      ? _selectedScenario!
-        : scenarios.first;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD0D5DD)),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<DevelopmentDashMockScenario>(
-          value: selected,
-          isExpanded: true,
-          icon: const Icon(
-            Icons.keyboard_arrow_down,
-            color: Color(0xFF101828),
-          ),
-          items: scenarios
-              .map(
-                (scenario) => DropdownMenuItem<DevelopmentDashMockScenario>(
-                  value: scenario,
-                  child: Text(
-                    'Cenario: ${scenario.label}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF101828),
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: _onScenarioChanged,
-        ),
       ),
     );
   }
