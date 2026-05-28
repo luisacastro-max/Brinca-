@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:app_twins/api_config.dart';
+import 'package:app_twins/model/onboarding_child_model.dart';
 import 'package:app_twins/services/core/backend_session_store.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PremiumPlanItem {
@@ -35,10 +39,23 @@ class PremiumPlanItem {
   bool get isCheckout => ctaType == 'checkout';
 }
 
+class PremiumCheckoutResult {
+  const PremiumCheckoutResult({
+    required this.message,
+    required this.activatedPremium,
+  });
+
+  final String message;
+  final bool activatedPremium;
+}
+
 class PremiumPlansPageService {
   PremiumPlansPageService({SubscriptionPlansApi? subscriptionPlansApi})
     : _subscriptionPlansApi =
           subscriptionPlansApi ?? ServiceSdk.instance.subscriptionPlans;
+
+  static const String _pendingOnboardingChildrenKey =
+      'pending_onboarding_children_for_premium_checkout';
 
   final SubscriptionPlansApi _subscriptionPlansApi;
 
@@ -125,16 +142,16 @@ class PremiumPlansPageService {
 
       await Stripe.instance.presentPaymentSheet();
 
-      await _subscriptionPlansApi.activatePremium(
+      final activationResponse = await _subscriptionPlansApi.activatePremium(
         paymentIntentId: paymentIntentId,
       );
-      await _refreshCurrentUserInSessionStore();
+      await _syncCurrentUserAfterPremiumActivation(activationResponse);
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<String?> processWebCheckoutReturn() async {
+  Future<PremiumCheckoutResult?> processWebCheckoutReturn() async {
     if (!kIsWeb) return null;
 
     final checkoutResult = Uri.base.queryParameters['checkout_result'];
@@ -146,18 +163,72 @@ class PremiumPlansPageService {
     }
 
     if (checkoutResult == 'cancel') {
-      return 'Pagamento cancelado.';
+      return const PremiumCheckoutResult(
+        message: 'Pagamento cancelado.',
+        activatedPremium: false,
+      );
     }
 
     if (checkoutResult != 'success' || checkoutSessionId.isEmpty) {
-      return 'Nao foi possivel validar o pagamento.';
+      return const PremiumCheckoutResult(
+        message: 'Nao foi possivel validar o pagamento.',
+        activatedPremium: false,
+      );
     }
 
-    await _subscriptionPlansApi.activatePremiumFromCheckoutSession(
+    final activationResponse =
+        await _subscriptionPlansApi.activatePremiumFromCheckoutSession(
       checkoutSessionId: checkoutSessionId,
     );
-    await _refreshCurrentUserInSessionStore();
-    return 'Pagamento concluido com sucesso.';
+    await _syncCurrentUserAfterPremiumActivation(activationResponse);
+    return const PremiumCheckoutResult(
+      message: 'Pagamento concluido com sucesso.',
+      activatedPremium: true,
+    );
+  }
+
+  Future<void> savePendingOnboardingChildren(
+    List<OnboardingChildModel> childrenDrafts,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final payload = childrenDrafts.map((child) => child.toJson()).toList();
+
+    await prefs.setString(
+      _pendingOnboardingChildrenKey,
+      jsonEncode(payload),
+    );
+  }
+
+  Future<List<OnboardingChildModel>> getPendingOnboardingChildren() async {
+    final prefs = await SharedPreferences.getInstance();
+    final rawValue = prefs.getString(_pendingOnboardingChildrenKey);
+
+    if (rawValue == null || rawValue.isEmpty) {
+      return const <OnboardingChildModel>[];
+    }
+
+    try {
+      final decoded = jsonDecode(rawValue);
+      if (decoded is! List) {
+        return const <OnboardingChildModel>[];
+      }
+
+      return decoded
+          .whereType<Map>()
+          .map(
+            (item) => OnboardingChildModel.fromJson(
+              Map<String, dynamic>.from(item),
+            ),
+          )
+          .toList();
+    } catch (_) {
+      return const <OnboardingChildModel>[];
+    }
+  }
+
+  Future<void> clearPendingOnboardingChildren() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_pendingOnboardingChildrenKey);
   }
 
   Future<void> _checkoutPlanWeb(PremiumPlanItem plan) async {
@@ -200,7 +271,17 @@ class PremiumPlansPageService {
     return Uri.base.replace(queryParameters: query).toString();
   }
 
-  Future<void> _refreshCurrentUserInSessionStore() async {
+  Future<void> _syncCurrentUserAfterPremiumActivation(
+    Map<String, dynamic> activationResponse,
+  ) async {
+    final activatedUser = activationResponse['user'];
+    if (activatedUser is Map) {
+      await BackendSessionStore.instance.saveUser(
+        Map<String, dynamic>.from(activatedUser),
+      );
+      return;
+    }
+
     final profile = await ServiceSdk.instance.users.getCurrentUserProfile();
     if (profile == null) return;
     await BackendSessionStore.instance.saveUser(profile);

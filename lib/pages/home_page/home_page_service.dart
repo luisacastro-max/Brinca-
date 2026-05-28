@@ -15,10 +15,13 @@ class HomePageViewData {
 }
 
 class HomePageService {
-  HomePageService({AuthApi? authApi})
-    : _authApi = authApi ?? ServiceSdk.instance.auth;
+  HomePageService({AuthApi? authApi, CompletedActivitiesApi? completedActivitiesApi})
+    : _authApi = authApi ?? ServiceSdk.instance.auth,
+      _completedActivitiesApi =
+          completedActivitiesApi ?? ServiceSdk.instance.completedActivities;
 
   final AuthApi _authApi;
+  final CompletedActivitiesApi _completedActivitiesApi;
 
   Future<bool> hasValidSession() async {
     final hasToken = await _authApi.isAuthenticated();
@@ -40,12 +43,17 @@ class HomePageService {
     final currentUser = await _authApi.getCurrentUser();
     final name = (currentUser?.name ?? 'Usuario').trim();
     final userInitial = name.isEmpty ? 'U' : name.substring(0, 1).toUpperCase();
+    final planLabel = (currentUser?.isPremium ?? false)
+        ? 'Plano Premium'
+        : 'Plano Gratuito';
+    final completedActivitiesThisWeek =
+        await _completedActivitiesApi.getCompletedActivitiesThisWeek();
 
     return HomePageViewData(
       userName: name.isEmpty ? 'Usuario' : name,
       userInitial: userInitial,
-      planLabel: 'Plano Gratuito',
-      completedActivitiesThisWeek: 5,
+      planLabel: planLabel,
+      completedActivitiesThisWeek: completedActivitiesThisWeek,
     );
   }
 

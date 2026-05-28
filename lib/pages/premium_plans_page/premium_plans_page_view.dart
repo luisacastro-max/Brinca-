@@ -1,11 +1,22 @@
+import 'package:app_twins/model/onboarding_child_model.dart';
+import 'package:app_twins/pages/clinic_home_page/clinic_home_page_router.dart';
+import 'package:app_twins/pages/home_page/home_page_router.dart';
+import 'package:app_twins/pages/objectives_selection_page/objectives_selection_page_service.dart';
 import 'package:app_twins/pages/premium_plans_page/premium_plans_page_service.dart';
 import 'package:app_twins/pages/premium_plans_page/widgets/premium_plan_card.dart';
 import 'package:app_twins/services/service.dart';
+import 'package:app_twins/utils/web_checkout_return_url_cleanup.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
 class PremiumPlansPageView extends StatefulWidget {
-  const PremiumPlansPageView({super.key});
+  const PremiumPlansPageView({
+    super.key,
+    this.pendingChildrenDrafts,
+  });
+
+  final List<OnboardingChildModel>? pendingChildrenDrafts;
 
   @override
   State<PremiumPlansPageView> createState() => _PremiumPlansPageViewState();
@@ -13,26 +24,49 @@ class PremiumPlansPageView extends StatefulWidget {
 
 class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
   final PremiumPlansPageService _service = PremiumPlansPageService();
+  final ObjectivesSelectionPageService _childrenService =
+      ObjectivesSelectionPageService();
 
   bool _isLoading = true;
   String? _errorMessage;
   List<PremiumPlanItem> _plans = const <PremiumPlanItem>[];
   String? _processingPlanId;
+  bool _isCompletingPendingOnboarding = false;
+  List<OnboardingChildModel> _pendingChildrenDrafts =
+      const <OnboardingChildModel>[];
 
   @override
   void initState() {
     super.initState();
+    _pendingChildrenDrafts = _cloneChildrenDrafts(widget.pendingChildrenDrafts);
     _loadPlans();
-    _processWebCheckoutReturn();
+    _initializePageState();
+  }
+
+  Future<void> _initializePageState() async {
+    await _restorePendingChildrenDrafts();
+    await _processWebCheckoutReturn();
+    await _resumePendingOnboardingIfCurrentUserIsPremium();
   }
 
   Future<void> _processWebCheckoutReturn() async {
     try {
-      final message = await _service.processWebCheckoutReturn();
-      if (!mounted || message == null || message.isEmpty) return;
+      final result = await _service.processWebCheckoutReturn();
+      if (!mounted || result == null || result.message.isEmpty) return;
+
+      clearCheckoutReturnQueryParams();
+
+      if (result.activatedPremium) {
+        final completedPendingOnboarding =
+            await _completePendingOnboardingIfNeeded();
+        if (!mounted || completedPendingOnboarding) return;
+
+        await _goToSignedInHome();
+        if (!mounted) return;
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(content: Text(result.message)),
       );
     } on ServiceException catch (e) {
       if (!mounted) return;
@@ -88,8 +122,20 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
     setState(() => _processingPlanId = plan.id);
 
     try {
+      if (_pendingChildrenDrafts.isNotEmpty) {
+        await _service.savePendingOnboardingChildren(_pendingChildrenDrafts);
+      }
+
       await _service.checkoutPlan(plan);
       if (!mounted) return;
+
+      if (kIsWeb) {
+        return;
+      }
+
+      final completedPendingOnboarding =
+          await _completePendingOnboardingIfNeeded();
+      if (!mounted || completedPendingOnboarding) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -116,6 +162,117 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
       if (mounted) {
         setState(() => _processingPlanId = null);
       }
+    }
+  }
+
+  Future<void> _restorePendingChildrenDrafts() async {
+    if (_pendingChildrenDrafts.isNotEmpty) {
+      return;
+    }
+
+    final restoredDrafts = await _service.getPendingOnboardingChildren();
+    if (!mounted || restoredDrafts.isEmpty) return;
+
+    setState(() {
+      _pendingChildrenDrafts = restoredDrafts;
+    });
+  }
+
+  Future<void> _resumePendingOnboardingIfCurrentUserIsPremium() async {
+    if (_pendingChildrenDrafts.isEmpty || _isCompletingPendingOnboarding) {
+      return;
+    }
+
+    final currentUser = await ServiceSdk.instance.auth.getCurrentUser();
+    if (!mounted || !(currentUser?.isPremium ?? false)) {
+      return;
+    }
+
+    await _completePendingOnboardingIfNeeded();
+  }
+
+  Future<bool> _completePendingOnboardingIfNeeded() async {
+    if (_pendingChildrenDrafts.isEmpty || _isCompletingPendingOnboarding) {
+      return false;
+    }
+
+    setState(() => _isCompletingPendingOnboarding = true);
+
+    try {
+      await _childrenService.createChildren(_pendingChildrenDrafts);
+      await _service.clearPendingOnboardingChildren();
+
+      if (!mounted) return true;
+
+      setState(() {
+        _pendingChildrenDrafts = const <OnboardingChildModel>[];
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Perfis criados com sucesso!')),
+      );
+
+      final currentUser = await ServiceSdk.instance.auth.getCurrentUser();
+      if (!mounted) return true;
+
+      clearCheckoutReturnQueryParams();
+
+      final userType = (currentUser?.userType ?? '').trim().toUpperCase();
+      if (userType == 'CLINIC') {
+        await ClinicHomePageRouter.goAndClearStack(context);
+      } else {
+        await HomePageRouter.goAndClearStack(context);
+      }
+
+      return true;
+    } on ServiceException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Pagamento confirmado, mas nao foi possivel concluir o cadastro das criancas: ${e.message}',
+            ),
+          ),
+        );
+      }
+      return false;
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Pagamento confirmado, mas nao foi possivel concluir o cadastro das criancas.',
+            ),
+          ),
+        );
+      }
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() => _isCompletingPendingOnboarding = false);
+      }
+    }
+  }
+
+  List<OnboardingChildModel> _cloneChildrenDrafts(
+    List<OnboardingChildModel>? childrenDrafts,
+  ) {
+    if (childrenDrafts == null || childrenDrafts.isEmpty) {
+      return <OnboardingChildModel>[];
+    }
+
+    return childrenDrafts.map((child) => child.copyWith()).toList();
+  }
+
+  Future<void> _goToSignedInHome() async {
+    final currentUser = await ServiceSdk.instance.auth.getCurrentUser();
+    if (!mounted) return;
+
+    final userType = (currentUser?.userType ?? '').trim().toUpperCase();
+    if (userType == 'CLINIC') {
+      await ClinicHomePageRouter.goAndClearStack(context);
+    } else {
+      await HomePageRouter.goAndClearStack(context);
     }
   }
 

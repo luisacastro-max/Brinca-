@@ -2,10 +2,12 @@ import 'package:app_twins/children_option.dart';
 import 'package:app_twins/design_system/components/gradient_progress_bar/gradient_progress_bar.dart';
 import 'package:app_twins/design_system/components/gradient_progress_bar/gradient_progress_bar_vm.dart';
 import 'package:app_twins/model/onboarding_child_model.dart';
+import 'package:app_twins/pages/children_selection_page/children_selection_page_router.dart';
 import 'package:app_twins/pages/clinic_home_page/clinic_home_page_router.dart';
 import 'package:app_twins/pages/home_page/home_page_router.dart';
 import 'package:app_twins/pages/objectives_selection_page/objectives_selection_page_router.dart';
 import 'package:app_twins/pages/objectives_selection_page/objectives_selection_page_service.dart';
+import 'package:app_twins/pages/premium_plans_page/premium_plans_page_router.dart';
 import 'package:app_twins/services/service.dart';
 import 'package:app_twins/theme/theme_data_base.dart';
 import 'package:flutter/material.dart';
@@ -100,15 +102,36 @@ class _ObjectivesSelectionPageViewState extends State<ObjectivesSelectionPageVie
 
     setState(() => _isSaving = true);
     try {
+      final currentUser = await ServiceSdk.instance.auth.getCurrentUser();
+      final isCurrentUserPremium = currentUser?.isPremium ?? false;
+      final mustBlockByFreePlan =
+          !isCurrentUserPremium && widget.childrenDrafts.length > 1;
+
+      if (mustBlockByFreePlan) {
+        if (!mounted) return;
+        final action = await _showFreePlanLimitDialog();
+        if (!mounted) return;
+
+        if (action == _FreePlanDialogAction.openPlans) {
+          await PremiumPlansPageRouter.go(
+            context,
+            pendingChildrenDrafts: widget.childrenDrafts,
+          );
+        } else if (action == _FreePlanDialogAction.backToStart) {
+          await Navigator.of(context).pushAndRemoveUntil(
+            ChildrenSelectionPageRouter.route(),
+            (_) => false,
+          );
+        }
+        return;
+      }
+
       await _service.createChildren(widget.childrenDrafts);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Perfil criado com sucesso!')),
       );
-
-      final currentUser = await ServiceSdk.instance.auth.getCurrentUser();
-      if (!mounted) return;
 
       final userType = (currentUser?.userType ?? '').trim().toUpperCase();
       if (userType == 'CLINIC') {
@@ -124,6 +147,29 @@ class _ObjectivesSelectionPageViewState extends State<ObjectivesSelectionPageVie
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
+  }
+
+  Future<_FreePlanDialogAction?> _showFreePlanLimitDialog() {
+    return showDialog<_FreePlanDialogAction>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Limite do plano free'),
+        content: const Text(
+          'No plano free, voce pode cadastrar apenas 1 crianca. Para cadastrar mais de 1 crianca, adquira um plano premium.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(_FreePlanDialogAction.backToStart),
+            child: const Text('Voltar para o inicio'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(_FreePlanDialogAction.openPlans),
+            child: const Text('Ver planos'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -276,3 +322,5 @@ class _ObjectivesSelectionPageViewState extends State<ObjectivesSelectionPageVie
     );
   }
 }
+
+enum _FreePlanDialogAction { openPlans, backToStart }
