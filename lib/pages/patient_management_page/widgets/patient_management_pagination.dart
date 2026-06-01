@@ -31,7 +31,7 @@ class PatientManagementPagination extends StatelessWidget {
         Expanded(
           child: Center(
             child: Text(
-              'Pagina $currentPage de $totalPages',
+              'Página $currentPage de $totalPages',
               style: const TextStyle(
                 color: Color(0xFF4B5563),
                 fontSize: 13,
@@ -43,7 +43,7 @@ class PatientManagementPagination extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: currentPage < totalPages ? onNext : null,
           icon: const Icon(Icons.chevron_right, size: 18),
-          label: const Text('Proxima'),
+          label: const Text('Próxima'),
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Color(0xFFD1D5DB)),
           ),

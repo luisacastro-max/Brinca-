@@ -50,7 +50,7 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
           _selectedChildId = null;
           _data = null;
           _isLoading = false;
-          _errorMessage = 'Nenhuma crianca cadastrada para exibir o dashboard.';
+          _errorMessage = 'Nenhuma criança cadastrada para exibir o dashboard.';
         });
         return;
       }
@@ -248,7 +248,7 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
                         icon: Icons.check_circle_outline,
                         iconBg: const Color(0xFFD1FAE5),
                         iconColor: const Color(0xFF10B981),
-                        title: 'Atividades Concluidas',
+                        title: 'Atividades Concluídas',
                         value: '${data.completedActivities}',
                         deltaPercent: data.completedDeltaPercent,
                       ),
@@ -257,7 +257,7 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
                         icon: Icons.trending_up,
                         iconBg: const Color(0xFFEDE9FE),
                         iconColor: const Color(0xFF9333EA),
-                        title: 'Media Diaria',
+                        title: 'Média Diária',
                         value: '${data.dailyAverageHours.toStringAsFixed(1)}h',
                         deltaPercent: data.averageDeltaPercent,
                       ),
@@ -266,12 +266,12 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
                         icon: Icons.gps_fixed,
                         iconBg: const Color(0xFFF2E1C9),
                         iconColor: const Color(0xFFFF4D00),
-                        title: 'Score de Consistencia',
+                        title: 'Score de Consistência',
                         value: '${data.consistencyScore}%',
                         deltaPercent: 0,
                         highlightText: '${data.consistencyLabel} ',
                         highlightColor: consistencyColor,
-                        trailingText: 'vs periodo anterior',
+                        trailingText: 'vs período anterior',
                       ),
                       const SizedBox(height: 10),
                       DevelopmentLineChartCard(values: data.offlineByWeek),
@@ -336,7 +336,7 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Selecione uma crianca para exportar o relatorio.'),
+          content: Text('Selecione uma criança para exportar o relatório.'),
         ),
       );
       return;
@@ -358,7 +358,7 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
       if (share) {
         await _reportsExportService.shareReport(
           report,
-          text: 'Relatorio de acompanhamento Brinca+',
+          text: 'Relatório de acompanhamento Brinca+',
         );
       } else {
         await _reportsExportService.saveReport(report);
@@ -369,8 +369,8 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
         SnackBar(
           content: Text(
             share
-                ? 'Relatorio pronto para compartilhamento.'
-                : 'Relatorio exportado com sucesso.',
+                ? 'Relatório pronto para compartilhamento.'
+                : 'Relatório exportado com sucesso.',
           ),
         ),
       );
@@ -383,7 +383,7 @@ class _DevelopmentDashPageViewState extends State<DevelopmentDashPageView> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Nao foi possivel exportar o relatorio.'),
+          content: Text('Não foi possível exportar o relatório.'),
         ),
       );
     } finally {

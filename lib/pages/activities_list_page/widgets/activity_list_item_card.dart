@@ -210,7 +210,7 @@ class ActivityListItemCard extends StatelessWidget {
 
   String _formatAgeLabel(String value) {
     if (value.trim().isEmpty) {
-      return 'Nao informado';
+      return 'Não informado';
     }
 
     return value;

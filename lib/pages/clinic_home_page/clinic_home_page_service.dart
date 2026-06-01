@@ -6,7 +6,7 @@ class ClinicRecentActivityItem {
     required this.childAgeLabel,
     required this.activityTitle,
     required this.completedLabel,
-    this.statusLabel = 'Concluida',
+    this.statusLabel = 'Concluída',
   });
 
   final String childName;
@@ -307,7 +307,7 @@ class ClinicHomePageService {
           ClinicAttentionItem(
             childName: child.name,
             ageLabel: child.ageLabel,
-            message: 'Sem atividades ha $days dias',
+            message: 'Sem atividades há $days dias',
             priority: ClinicAttentionPriority.high,
           ),
         );
@@ -316,7 +316,7 @@ class ClinicHomePageService {
           ClinicAttentionItem(
             childName: child.name,
             ageLabel: child.ageLabel,
-            message: 'Engajamento abaixo da media',
+            message: 'Engajamento abaixo da média',
             priority: ClinicAttentionPriority.medium,
           ),
         );
@@ -345,9 +345,9 @@ class ClinicHomePageService {
     final diff = now.difference(date);
 
     if (diff.inMinutes < 1) return 'Agora';
-    if (diff.inHours < 1) return '${diff.inMinutes} min atras';
-    if (diff.inDays < 1) return '${diff.inHours}h atras';
-    return '${diff.inDays}d atras';
+    if (diff.inHours < 1) return '${diff.inMinutes} min atrás';
+    if (diff.inDays < 1) return '${diff.inHours}h atrás';
+    return '${diff.inDays}d atrás';
   }
 }
 
@@ -370,7 +370,7 @@ class _ChildInfo {
 
     return _ChildInfo(
       id: (json['_id'] ?? json['id'] ?? '').toString(),
-      name: (json['name'] ?? 'Crianca').toString(),
+      name: (json['name'] ?? 'Criança').toString(),
       ageLabel: ageLabel,
       dailyTimeMinutes: _asInt(json['dailyTime']),
     );

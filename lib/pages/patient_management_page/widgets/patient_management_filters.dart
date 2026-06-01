@@ -84,7 +84,7 @@ class PatientManagementFilters extends StatelessWidget {
                   options: const [
                     _FilterOption('all', 'Todos os engajamentos'),
                     _FilterOption('high', 'Alto'),
-                    _FilterOption('medium', 'Medio'),
+                    _FilterOption('medium', 'Médio'),
                     _FilterOption('low', 'Baixo'),
                   ],
                   onChanged: onEngagementChanged,

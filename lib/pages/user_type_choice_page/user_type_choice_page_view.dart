@@ -86,7 +86,7 @@ class _UserTypeChoicePageViewState extends State<UserTypeChoicePageView> {
               ),
               const SizedBox(height: 18),
               const Text(
-                'Como voce deseja entrar?',
+                'Como você deseja entrar?',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 26 / 1.5,
@@ -96,7 +96,7 @@ class _UserTypeChoicePageViewState extends State<UserTypeChoicePageView> {
               ),
               const SizedBox(height: 6),
               const Text(
-                'Escolha o perfil que melhor descreve voce',
+                'Escolha o perfil que melhor descreve você',
                 style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 14),
@@ -125,7 +125,7 @@ class _UserTypeChoicePageViewState extends State<UserTypeChoicePageView> {
               ),
               const SizedBox(height: 4),
               const Text(
-                'Ao continuar, voce concorda com nossos Termos de Uso e Politica de Privacidade',
+                'Ao continuar, você concorda com nossos Termos de Uso e Política de Privacidade',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 10, color: Color(0xFF9CA3AF)),
               ),

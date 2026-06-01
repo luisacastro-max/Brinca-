@@ -88,12 +88,12 @@ class _ActivitiesListPageViewState extends State<ActivitiesListPageView> {
       builder: (context) => AlertDialog(
         title: const Text('Atividade Premium'),
         content: const Text(
-          'Essa atividade esta disponivel apenas para usuarios premium. Deseja conhecer nossos planos?',
+          'Essa atividade está disponível apenas para usuários premium. Deseja conhecer nossos planos?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Agora nao'),
+            child: const Text('Agora não'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),

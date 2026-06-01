@@ -138,7 +138,7 @@ class ServiceHttpClient {
     if (requiresAuth && (token == null || token.isEmpty)) {
       throw const ServiceException(
         statusCode: 401,
-        message: 'Sessao nao autenticada para esta operacao.',
+        message: 'Sessão não autenticada para esta operação.',
       );
     }
 
@@ -156,12 +156,12 @@ class ServiceHttpClient {
     } on TimeoutException {
       throw const ServiceException(
         statusCode: 408,
-        message: 'Tempo de requisicao esgotado.',
+        message: 'Tempo de requisição esgotado.',
       );
     } catch (e) {
       throw ServiceException(
         statusCode: 0,
-        message: 'Falha de conexao com o servidor.',
+        message: 'Falha de conexão com o servidor.',
         details: kDebugMode ? e.toString() : null,
       );
     }
@@ -199,7 +199,7 @@ class ServiceHttpClient {
     if (requiresAuth && (token == null || token.isEmpty)) {
       throw const ServiceException(
         statusCode: 401,
-        message: 'Sessao nao autenticada para esta operacao.',
+        message: 'Sessão não autenticada para esta operação.',
       );
     }
 
@@ -243,18 +243,18 @@ class ServiceHttpClient {
         default:
           throw ServiceException(
             statusCode: 500,
-            message: 'Metodo HTTP nao suportado: $method',
+            message: 'Método HTTP não suportado: $method',
           );
       }
     } on TimeoutException {
       throw const ServiceException(
         statusCode: 408,
-        message: 'Tempo de requisicao esgotado.',
+        message: 'Tempo de requisição esgotado.',
       );
     } catch (e) {
       throw ServiceException(
         statusCode: 0,
-        message: 'Falha de conexao com o servidor.',
+        message: 'Falha de conexão com o servidor.',
         details: kDebugMode ? e.toString() : null,
       );
     }

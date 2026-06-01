@@ -94,7 +94,7 @@ class PremiumPlansPageService {
       if (!plan.isCheckout) {
         throw const ServiceException(
           statusCode: 400,
-          message: 'Este plano nao possui checkout direto no app.',
+          message: 'Este plano não possui checkout direto no app.',
         );
       }
 
@@ -107,7 +107,7 @@ class PremiumPlansPageService {
         throw const ServiceException(
           statusCode: 500,
           message:
-              'Stripe nao configurado no app. Defina STRIPE_PUBLISHABLE_KEY no build.',
+              'Stripe não configurado no app. Defina STRIPE_PUBLISHABLE_KEY no build.',
         );
       }
 
@@ -123,13 +123,13 @@ class PremiumPlansPageService {
       if (clientSecret.isEmpty) {
         throw const ServiceException(
           statusCode: 500,
-          message: 'clientSecret nao retornado pelo backend.',
+          message: 'clientSecret não retornado pelo backend.',
         );
       }
       if (paymentIntentId.isEmpty) {
         throw const ServiceException(
           statusCode: 500,
-          message: 'paymentIntentId nao retornado pelo backend.',
+          message: 'paymentIntentId não retornado pelo backend.',
         );
       }
 
@@ -171,7 +171,7 @@ class PremiumPlansPageService {
 
     if (checkoutResult != 'success' || checkoutSessionId.isEmpty) {
       return const PremiumCheckoutResult(
-        message: 'Nao foi possivel validar o pagamento.',
+        message: 'Não foi possível validar o pagamento.',
         activatedPremium: false,
       );
     }
@@ -182,7 +182,7 @@ class PremiumPlansPageService {
     );
     await _syncCurrentUserAfterPremiumActivation(activationResponse);
     return const PremiumCheckoutResult(
-      message: 'Pagamento concluido com sucesso.',
+      message: 'Pagamento concluído com sucesso.',
       activatedPremium: true,
     );
   }
@@ -245,7 +245,7 @@ class PremiumPlansPageService {
     if (checkoutUrl.isEmpty) {
       throw const ServiceException(
         statusCode: 500,
-        message: 'checkoutUrl nao retornada pelo backend.',
+        message: 'checkoutUrl não retornada pelo backend.',
       );
     }
 
@@ -257,7 +257,7 @@ class PremiumPlansPageService {
     if (!opened) {
       throw const ServiceException(
         statusCode: 500,
-        message: 'Nao foi possivel abrir o checkout no navegador.',
+        message: 'Não foi possível abrir o checkout no navegador.',
       );
     }
   }

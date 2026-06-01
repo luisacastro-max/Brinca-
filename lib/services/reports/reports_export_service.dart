@@ -38,7 +38,7 @@ class ReportsExportService {
 
   Future<void> saveReport(ReportDownloadResult result) async {
     final fileName = result.fileName.trim().isEmpty
-        ? 'relatorio.pdf'
+        ? 'relatório.pdf'
         : result.fileName.trim();
 
     final dotIndex = fileName.lastIndexOf('.');

@@ -23,22 +23,22 @@ class UserTypeChoicePageService {
     return const <UserTypeChoiceOption>[
       UserTypeChoiceOption(
         code: 'PARENT',
-        title: 'Responsavel',
-        description: 'Para pais e responsaveis acompanharem o desenvolvimento da crianca',
+        title: 'Responsável',
+        description: 'Para pais e responsáveis acompanharem o desenvolvimento da criança',
         icon: Icons.family_restroom,
         registrationUserType: 'PARENT',
       ),
       UserTypeChoiceOption(
         code: 'CLINIC',
-        title: 'Clinica',
+        title: 'Clínica',
         description: 'Para profissionais acompanharem pacientes e indicarem atividades',
         icon: Icons.psychology,
         registrationUserType: 'CLINIC',
       ),
       UserTypeChoiceOption(
         code: 'INSTITUTION',
-        title: 'Instituicao',
-        description: 'Para escolas e organizacoes aplicarem atividades em grupo',
+        title: 'Instituição',
+        description: 'Para escolas e organizações aplicarem atividades em grupo',
         icon: Icons.account_balance,
         registrationUserType: 'CLINIC',
       ),
@@ -51,6 +51,6 @@ class UserTypeChoicePageService {
       return normalized;
     }
 
-    throw StateError('registrationUserType invalido para cadastro.');
+    throw StateError('registrationUserType inválido para cadastro.');
   }
 }

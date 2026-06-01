@@ -76,7 +76,7 @@ class DevelopmentMetricCard extends StatelessWidget {
                 ),
               ),
               Text(
-                trailingText ?? 'vs periodo anterior',
+                trailingText ?? 'vs período anterior',
                 style: const TextStyle(
                   fontSize: 12,
                   color: Color(0xFF6A7282),

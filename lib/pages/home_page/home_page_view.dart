@@ -139,7 +139,7 @@ class _HomePageViewState extends State<HomePageView> {
         ),
         const SizedBox(height: 4),
         const Text(
-          'Veja o progresso da sua familia',
+          'Veja o progresso da sua família',
           style: TextStyle(fontSize: 14, color: Color(0xFF5A6578)),
         ),
         const SizedBox(height: 28),
@@ -234,7 +234,7 @@ class _HomePageViewState extends State<HomePageView> {
               const SizedBox(height: 10),
               HomeDrawerItem(
                 icon: Icons.home_outlined,
-                label: 'Inicio',
+                label: 'Início',
                 selected: true,
                 onTap: () => Navigator.of(context).pop(),
               ),
@@ -248,7 +248,7 @@ class _HomePageViewState extends State<HomePageView> {
               ),
               HomeDrawerItem(
                 icon: Icons.query_stats_outlined,
-                label: 'Relatorio de Desenvolvimento',
+                label: 'Relatório de Desenvolvimento',
                 onTap: () {
                   Navigator.of(context).pop();
                   DevelopmentDashPageRouter.go(context);

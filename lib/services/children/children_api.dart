@@ -30,7 +30,7 @@ class ChildrenApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao criar crianca.',
+      message: 'Resposta inválida ao criar criança.',
     );
   }
 
@@ -64,7 +64,7 @@ class ChildrenApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao atualizar crianca.',
+      message: 'Resposta inválida ao atualizar criança.',
     );
   }
 

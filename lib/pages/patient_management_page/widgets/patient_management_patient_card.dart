@@ -127,7 +127,7 @@ class PatientManagementPatientCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _MetricBox(
-                  title: 'Ultima Atividade',
+                  title: 'Última Atividade',
                   value: patient.lastActivityLabel,
                 ),
               ),

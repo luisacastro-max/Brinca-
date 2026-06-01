@@ -14,7 +14,7 @@ class ObjectivesSelectionPageService {
           child.timeOptionIndex == null) {
         throw const ServiceException(
           statusCode: 400,
-          message: 'Dados obrigatorios de uma ou mais criancas estao incompletos.',
+          message: 'Dados obrigatórios de uma ou mais crianças estão incompletos.',
         );
       }
 

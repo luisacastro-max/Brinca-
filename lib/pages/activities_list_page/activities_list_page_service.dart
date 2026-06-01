@@ -92,7 +92,7 @@ class ActivitiesListPageService {
             final id = (json['_id'] ?? json['id'] ?? '').toString().trim();
             if (id.isEmpty) return null;
 
-            final name = (json['name'] ?? 'Crianca').toString().trim();
+            final name = (json['name'] ?? 'Criança').toString().trim();
             final ageRangeCode = (json['ageRange'] ?? '').toString().trim();
             return ActivitiesChildOption(
               id: id,
@@ -150,7 +150,7 @@ class ActivitiesListPageService {
 
   ActivityListItem _mapFromApi(Map<String, dynamic> json) {
     final id = (json['_id'] ?? json['id'] ?? '').toString();
-    final title = (json['title'] ?? 'Atividade sem titulo').toString();
+    final title = (json['title'] ?? 'Atividade sem título').toString();
     final description = (json['description'] ?? '').toString();
 
     final durationLabel = _readString(
@@ -161,17 +161,17 @@ class ActivitiesListPageService {
     final ageLabel = _readString(
       json,
       keys: const ['ageLabel', 'ageRange'],
-      fallback: 'Nao informado',
+      fallback: 'Não informado',
     );
     final areaLabel = _readString(
       json,
       keys: const ['areaLabel'],
-      fallback: 'Sem area',
+      fallback: 'Sem área',
     );
     final difficulty = _readString(
       json,
       keys: const ['difficulty'],
-      fallback: 'Nao informado',
+      fallback: 'Não informado',
     );
 
     final isNeurodivergenceValid = _asBool(

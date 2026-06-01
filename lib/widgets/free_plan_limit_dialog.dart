@@ -7,16 +7,16 @@ Future<FreePlanDialogAction?> showFreePlanLimitDialog(BuildContext context) {
     context: context,
     barrierDismissible: false,
     builder: (context) => AlertDialog(
-      title: const Text('Limite do plano free'),
+      title: const Text('Limite do plano gratuito'),
       content: const Text(
-        'No plano free, voce pode cadastrar apenas 1 crianca. Para cadastrar mais de 1 crianca, adquira um plano premium.',
+        'No plano gratuito, você pode cadastrar apenas 1 criança. Para cadastrar mais de 1 criança, adquira um plano premium.',
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(
             FreePlanDialogAction.backToStart,
           ),
-          child: const Text('Voltar para o inicio'),
+          child: const Text('Voltar para o início'),
         ),
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(

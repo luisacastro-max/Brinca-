@@ -36,12 +36,12 @@ class HomePageService {
     if (!isValid) {
       throw const ServiceException(
         statusCode: 401,
-        message: 'Sessao invalida. Faca login novamente.',
+        message: 'Sessão inválida. Faça login novamente.',
       );
     }
 
     final currentUser = await _authApi.getCurrentUser();
-    final name = (currentUser?.name ?? 'Usuario').trim();
+    final name = (currentUser?.name ?? 'Usuário').trim();
     final userInitial = name.isEmpty ? 'U' : name.substring(0, 1).toUpperCase();
     final planLabel = (currentUser?.isPremium ?? false)
         ? 'Plano Premium'
@@ -50,7 +50,7 @@ class HomePageService {
         await _completedActivitiesApi.getCompletedActivitiesThisWeek();
 
     return HomePageViewData(
-      userName: name.isEmpty ? 'Usuario' : name,
+      userName: name.isEmpty ? 'Usuário' : name,
       userInitial: userInitial,
       planLabel: planLabel,
       completedActivitiesThisWeek: completedActivitiesThisWeek,

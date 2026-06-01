@@ -23,7 +23,7 @@ class CompletedActivitiesApi {
     if (response is! Map<String, dynamic>) {
       throw const ServiceException(
         statusCode: 500,
-        message: 'Resposta invalida ao iniciar atividade.',
+        message: 'Resposta inválida ao iniciar atividade.',
       );
     }
 
@@ -68,7 +68,7 @@ class CompletedActivitiesApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao buscar atividades concluidas.',
+      message: 'Resposta inválida ao buscar atividades concluídas.',
     );
   }
 
@@ -81,7 +81,7 @@ class CompletedActivitiesApi {
     if (response is! Map<String, dynamic>) {
       throw const ServiceException(
         statusCode: 500,
-        message: 'Resposta invalida ao buscar resumo semanal.',
+        message: 'Resposta inválida ao buscar resumo semanal.',
       );
     }
 

@@ -16,14 +16,14 @@ class RegistrationPageService {
     if (name.trim().isEmpty || email.trim().isEmpty || password.isEmpty || userType.isEmpty) {
       throw const ServiceException(
         statusCode: 400,
-        message: 'Preencha todos os campos obrigatorios.',
+        message: 'Preencha todos os campos obrigatórios.',
       );
     }
 
     if (password != confirmPassword) {
       throw const ServiceException(
         statusCode: 400,
-        message: 'As senhas nao conferem.',
+        message: 'As senhas não conferem.',
       );
     }
 

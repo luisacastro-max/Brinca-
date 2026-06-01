@@ -80,7 +80,7 @@ class DevelopmentDashPageService {
 
     return children
         .map((item) {
-          final name = (item['name'] ?? 'Crianca').toString();
+          final name = (item['name'] ?? 'Criança').toString();
           final ageRange = (item['ageRange'] ?? 'Sem idade').toString();
 
           return DevelopmentChildOption(
