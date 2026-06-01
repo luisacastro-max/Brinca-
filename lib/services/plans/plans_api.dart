@@ -42,7 +42,7 @@ class PlansApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao criar plano.',
+      message: 'Resposta inválida ao criar plano.',
     );
   }
 
@@ -60,7 +60,7 @@ class PlansApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao atualizar plano.',
+      message: 'Resposta inválida ao atualizar plano.',
     );
   }
 }

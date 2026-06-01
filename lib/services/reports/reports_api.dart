@@ -28,7 +28,7 @@ class ReportsApi {
 
     return ReportDownloadResult(
       bytes: response.bytes,
-      fileName: response.fileName ?? 'relatorio_pais.pdf',
+      fileName: response.fileName ?? 'relatório_pais.pdf',
       contentType: response.contentType,
     );
   }
@@ -52,7 +52,7 @@ class ReportsApi {
 
     return ReportDownloadResult(
       bytes: response.bytes,
-      fileName: response.fileName ?? 'relatorio_clinico.pdf',
+      fileName: response.fileName ?? 'relatório_clínico.pdf',
       contentType: response.contentType,
     );
   }

@@ -34,7 +34,7 @@ class StepsSection extends StatelessWidget {
           const SizedBox(height: 14),
           if (steps.isEmpty)
             const Text(
-              'Nao informado no backend.',
+              'Não informado no backend.',
               style: TextStyle(fontSize: 14, color: Color(0xFF667085)),
             )
           else

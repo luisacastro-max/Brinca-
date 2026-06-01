@@ -51,7 +51,7 @@ class _DevelopmentHistoryTableCardState extends State<DevelopmentHistoryTableCar
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Historico Detalhado de Atividades',
+                        'Histórico Detalhado de Atividades',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -81,7 +81,7 @@ class _DevelopmentHistoryTableCardState extends State<DevelopmentHistoryTableCar
             const Padding(
               padding: EdgeInsets.all(18),
               child: Text(
-                'Nenhuma atividade encontrada no periodo selecionado.',
+                'Nenhuma atividade encontrada no período selecionado.',
                 style: TextStyle(
                   fontSize: 14,
                   color: Color(0xFF6B7280),

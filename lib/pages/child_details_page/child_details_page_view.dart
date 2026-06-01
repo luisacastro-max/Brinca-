@@ -56,7 +56,7 @@ class _ChildDetailsPageViewState extends State<ChildDetailsPageView> {
   void _onContinuePressed() {
     if (_nameController.text.trim().isEmpty || selectedAge == null || selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha nome, idade e tempo da crianca.')),
+        const SnackBar(content: Text('Preencha nome, idade e tempo da criança.')),
       );
       return;
     }

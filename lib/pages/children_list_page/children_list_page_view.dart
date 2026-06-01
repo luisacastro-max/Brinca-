@@ -35,7 +35,7 @@ class _ChildrenListPageViewState extends State<ChildrenListPageView> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = 'Erro ao carregar criancas: $e';
+        _errorMessage = 'Erro ao carregar crianças: $e';
       });
     } finally {
       if (mounted) {
@@ -55,7 +55,7 @@ class _ChildrenListPageViewState extends State<ChildrenListPageView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Criancas cadastradas'),
+        title: const Text('Crianças cadastradas'),
       ),
       body: RefreshIndicator(
         onRefresh: _loadChildren,
@@ -89,7 +89,7 @@ class _ChildrenListPageViewState extends State<ChildrenListPageView> {
       return ListView(
         children: const [
           SizedBox(height: 140),
-          Center(child: Text('Nenhuma crianca encontrada para este usuario.')),
+          Center(child: Text('Nenhuma criança encontrada para este usuário.')),
         ],
       );
     }
@@ -114,12 +114,12 @@ class _ChildrenListPageViewState extends State<ChildrenListPageView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name.isEmpty ? 'Crianca sem nome' : name,
+                  name.isEmpty ? 'Criança sem nome' : name,
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Text('Faixa etaria: $ageRange'),
-                Text('Tempo diario: $dailyTime min'),
+                Text('Faixa etária: $ageRange'),
+                Text('Tempo diário: $dailyTime min'),
                 if (goals.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text('Objetivos: ${goals.join(', ')}'),

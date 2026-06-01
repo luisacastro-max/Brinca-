@@ -37,7 +37,7 @@ class SubscriptionPlansApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao criar payment intent.',
+      message: 'Resposta inválida ao criar payment intent.',
     );
   }
 
@@ -61,7 +61,7 @@ class SubscriptionPlansApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao criar checkout session.',
+      message: 'Resposta inválida ao criar checkout session.',
     );
   }
 
@@ -80,7 +80,7 @@ class SubscriptionPlansApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao ativar premium.',
+      message: 'Resposta inválida ao ativar premium.',
     );
   }
 
@@ -99,7 +99,7 @@ class SubscriptionPlansApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao ativar premium via checkout session.',
+      message: 'Resposta inválida ao ativar premium via checkout session.',
     );
   }
 }

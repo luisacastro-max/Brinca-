@@ -77,7 +77,7 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Nao foi possivel validar o retorno do checkout.'),
+          content: Text('Não foi possível validar o retorno do checkout.'),
         ),
       );
     }
@@ -113,7 +113,7 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
     if (plan.ctaType != 'checkout') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Nosso time comercial entrara em contato em breve.'),
+          content: Text('Nosso time comercial entrará em contato em breve.'),
         ),
       );
       return;
@@ -139,7 +139,7 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Pagamento concluido com sucesso.'),
+          content: Text('Pagamento concluído com sucesso.'),
         ),
       );
     } on StripeException catch (e) {
@@ -156,7 +156,7 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nao foi possivel processar o pagamento.')),
+        const SnackBar(content: Text('Não foi possível processar o pagamento.')),
       );
     } finally {
       if (mounted) {
@@ -230,7 +230,7 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Pagamento confirmado, mas nao foi possivel concluir o cadastro das criancas: ${e.message}',
+              'Pagamento confirmado, mas não foi possível concluir o cadastro das crianças: ${e.message}',
             ),
           ),
         );
@@ -241,7 +241,7 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Pagamento confirmado, mas nao foi possivel concluir o cadastro das criancas.',
+              'Pagamento confirmado, mas não foi possível concluir o cadastro das crianças.',
             ),
           ),
         );
@@ -312,7 +312,7 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
             ),
             const SizedBox(height: 12),
             const Text(
-              'Escolha o plano ideal para sua familia ou instituicao',
+              'Escolha o plano ideal para sua família ou instituição',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 32 / 1.65,
@@ -323,7 +323,7 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Desenvolvemos solucoes personalizadas e acessiveis para reducao de tempo de tela, com atividades personalizadas e acompanhamento especializado.',
+              'Desenvolvemos soluções personalizadas e acessíveis para redução do tempo de tela, com atividades personalizadas e acompanhamento especializado.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -371,7 +371,7 @@ class _PremiumPlansPageViewState extends State<PremiumPlansPageView> {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 20),
         child: Text(
-          'Nenhum plano disponivel no momento.',
+          'Nenhum plano disponível no momento.',
           textAlign: TextAlign.center,
           style: TextStyle(color: Color(0xFF667085)),
         ),

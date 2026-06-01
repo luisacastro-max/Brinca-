@@ -145,7 +145,7 @@ class PatientManagementPageService {
 
   String _safeClinicName(String? name) {
     final value = (name ?? '').trim();
-    if (value.isEmpty) return 'Profissional Responsavel';
+    if (value.isEmpty) return 'Profissional Responsável';
     return value;
   }
 
@@ -174,7 +174,7 @@ class PatientManagementPageService {
 
   String _engagementLabel(PatientEngagementLevel level) {
     if (level == PatientEngagementLevel.high) return 'Alto';
-    if (level == PatientEngagementLevel.medium) return 'Medio';
+    if (level == PatientEngagementLevel.medium) return 'Médio';
     return 'Baixo';
   }
 
@@ -195,9 +195,9 @@ class PatientManagementPageService {
 
     final diff = now.difference(date);
     if (diff.inMinutes < 1) return 'Agora';
-    if (diff.inHours < 1) return '${diff.inMinutes}m atras';
-    if (diff.inDays < 1) return '${diff.inHours}h atras';
-    return '${diff.inDays}d atras';
+    if (diff.inHours < 1) return '${diff.inMinutes}m atrás';
+    if (diff.inDays < 1) return '${diff.inHours}h atrás';
+    return '${diff.inDays}d atrás';
   }
 
   String _initials(String name) {

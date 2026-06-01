@@ -169,7 +169,7 @@ class RecommendPagePageService {
     return RecommendActivityItem(
       id: id,
       title: title.isEmpty ? 'Atividade' : title,
-      description: description.isEmpty ? 'Sem descricao.' : description,
+      description: description.isEmpty ? 'Sem descrição.' : description,
       durationLabel: durationLabel,
       ageRangeLabel: ageRangeLabel,
       developmentGoals: goals,

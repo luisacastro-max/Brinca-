@@ -54,7 +54,7 @@ class ActivitiesApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao buscar atividade.',
+      message: 'Resposta inválida ao buscar atividade.',
     );
   }
 
@@ -68,7 +68,7 @@ class ActivitiesApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao buscar recomendacoes.',
+      message: 'Resposta inválida ao buscar recomendações.',
     );
   }
 
@@ -85,7 +85,7 @@ class ActivitiesApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao criar atividade.',
+      message: 'Resposta inválida ao criar atividade.',
     );
   }
 
@@ -103,7 +103,7 @@ class ActivitiesApi {
 
     throw const ServiceException(
       statusCode: 500,
-      message: 'Resposta invalida ao atualizar atividade.',
+      message: 'Resposta inválida ao atualizar atividade.',
     );
   }
 

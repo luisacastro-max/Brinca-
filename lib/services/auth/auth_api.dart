@@ -13,7 +13,7 @@ class AuthApi {
     if (normalized != 'PARENT' && normalized != 'CLINIC') {
       throw const ServiceException(
         statusCode: 400,
-        message: 'userType invalido. Use PARENT ou CLINIC.',
+        message: 'userType inválido. Use PARENT ou CLINIC.',
       );
     }
     return normalized;
@@ -35,7 +35,7 @@ class AuthApi {
     if (name.trim().isEmpty || email.trim().isEmpty || password.isEmpty) {
       throw const ServiceException(
         statusCode: 400,
-        message: 'Nome, email e senha sao obrigatorios.',
+        message: 'Nome, e-mail e senha são obrigatórios.',
       );
     }
   }
@@ -47,7 +47,7 @@ class AuthApi {
     if (email.trim().isEmpty || password.isEmpty) {
       throw const ServiceException(
         statusCode: 400,
-        message: 'Email e senha sao obrigatorios.',
+        message: 'E-mail e senha são obrigatórios.',
       );
     }
   }
@@ -89,7 +89,7 @@ class AuthApi {
     if (response is! Map<String, dynamic>) {
       throw const ServiceException(
         statusCode: 500,
-        message: 'Resposta invalida no login.',
+        message: 'Resposta inválida no login.',
       );
     }
 
@@ -97,7 +97,7 @@ class AuthApi {
     if (session.token.isEmpty) {
       throw const ServiceException(
         statusCode: 500,
-        message: 'Token nao retornado pelo backend.',
+        message: 'Token não retornado pelo backend.',
       );
     }
 

@@ -63,7 +63,7 @@ class WelcomePageView extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Vamos ajuda-lo a criar atividades educativas e divertidas para seus filhos, reduzindo o tempo de tela de forma pratica e personalizada.',
+                'Vamos ajudá-lo a criar atividades educativas e divertidas para seus filhos, reduzindo o tempo de tela de forma prática e personalizada.',
                 style: buttonTextStyle.copyWith(
                   fontSize: 14,
                   color: Colors.grey[600],
@@ -87,7 +87,7 @@ class WelcomePageView extends StatelessWidget {
                   ),
                   _buildFeatureIcon(
                     Icons.track_changes,
-                    'Facil de Usar',
+                    'Fácil de Usar',
                     const Color(0xFFA8D8BB),
                   ),
                 ],
@@ -112,7 +112,7 @@ class WelcomePageView extends StatelessWidget {
                   ),
                   child: Center(
                     child: const Text(
-                      'Comecar',
+                      'Começar',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

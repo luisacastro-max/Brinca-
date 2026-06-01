@@ -128,7 +128,7 @@ class DevelopmentDashFilters extends StatelessWidget {
                             ),
                             SizedBox(width: 6),
                             Text(
-                              'Ultima semana',
+                              'Última semana',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -149,7 +149,7 @@ class DevelopmentDashFilters extends StatelessWidget {
                             ),
                             SizedBox(width: 6),
                             Text(
-                              'Ultimas 2 semanas',
+                              'Últimas 2 semanas',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,

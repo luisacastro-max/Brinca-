@@ -78,7 +78,7 @@ class _ActivitiesPageViewState extends State<ActivitiesPageView> {
 
         if (children.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Cadastre uma crianca para iniciar.')),
+            const SnackBar(content: Text('Cadastre uma criança para iniciar.')),
           );
           return;
         }
@@ -112,7 +112,7 @@ class _ActivitiesPageViewState extends State<ActivitiesPageView> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nao foi possivel atualizar a atividade.')),
+        const SnackBar(content: Text('Não foi possível atualizar a atividade.')),
       );
     } finally {
       if (mounted) {
@@ -141,7 +141,7 @@ class _ActivitiesPageViewState extends State<ActivitiesPageView> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('Selecionar criancas'),
+              title: const Text('Selecionar crianças'),
               content: SizedBox(
                 width: double.maxFinite,
                 child: SingleChildScrollView(

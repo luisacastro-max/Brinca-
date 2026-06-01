@@ -63,7 +63,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
       setState(() => _errorMessage = e.message);
     } catch (_) {
       if (!mounted) return;
-      setState(() => _errorMessage = 'Erro ao carregar painel da clinica.');
+      setState(() => _errorMessage = 'Erro ao carregar painel da clínica.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -149,7 +149,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       children: [
         const Text(
-          'Painel da Clinica',
+          'Painel da Clínica',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
@@ -158,7 +158,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
         ),
         const SizedBox(height: 8),
         const Text(
-          'Visao geral do progresso dos pacientes',
+          'Visão geral do progresso dos pacientes',
           style: TextStyle(
             color: Color(0xFF4A5565),
             fontSize: 16,
@@ -189,7 +189,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
           icon: Icons.schedule_outlined,
           iconColor: const Color(0xFF9333EA),
           iconBackground: const Color(0xFFEDE9FE),
-          title: 'Tempo Offline Medio',
+          title: 'Tempo Offline Médio',
           value: '${data.metric.averageOfflineHours.toStringAsFixed(1)}h',
           deltaLabel: _formatDeltaLabel(data.metric.averageOfflineHoursDelta),
           positive: data.metric.averageOfflineHoursDelta >= 0,
@@ -212,7 +212,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
               ? const Padding(
                   padding: EdgeInsets.only(top: 24),
                   child: Text(
-                    'Nenhuma atividade concluida ainda.',
+                    'Nenhuma atividade concluída ainda.',
                     style: TextStyle(color: Color(0xFF6B7280)),
                   ),
                 )
@@ -237,7 +237,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
         ),
         const SizedBox(height: 32),
         _buildSectionContainer(
-          title: 'Atencao Necessaria',
+          title: 'Atenção Necessária',
           child: data.attentionItems.isEmpty
               ? const Padding(
                   padding: EdgeInsets.only(top: 8),
@@ -288,13 +288,13 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
         const SizedBox(height: 16),
         ClinicQuickActionCard(
           title: 'Recomendar Atividades',
-          subtitle: 'Enviar sugestoes personalizadas',
+          subtitle: 'Enviar sugestões personalizadas',
           onTap: () => RecommendPageRouter.go(context),
         ),
         const SizedBox(height: 16),
         ClinicQuickActionCard(
-          title: 'Gerar Relatorios',
-          subtitle: 'Exportar dados e analises',
+          title: 'Gerar Relatórios',
+          subtitle: 'Exportar dados e análises',
           onTap: _openClinicReportActions,
         ),
       ],
@@ -354,9 +354,9 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
     final user = _currentUser;
     final userName = (user?.name.trim().isNotEmpty ?? false)
         ? user!.name
-        : 'Usuario';
+      : 'Usuário';
     final userInitial = userName.substring(0, 1).toUpperCase();
-    const planLabel = 'Perfil Clinica';
+    const planLabel = 'Perfil Clínica';
 
     return SizedBox(
       child: Drawer(
@@ -408,7 +408,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
               const SizedBox(height: 10),
               HomeDrawerItem(
                 icon: Icons.home_outlined,
-                label: 'Inicio',
+                label: 'Início',
                 selected: true,
                 onTap: () => Navigator.of(context).pop(),
               ),
@@ -430,7 +430,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
               ),
               HomeDrawerItem(
                 icon: Icons.insert_chart_outlined,
-                label: 'Gerar Relatorios',
+                label: 'Gerar Relatórios',
                 onTap: () {
                   Navigator.of(context).pop();
                   _openClinicReportActions();
@@ -502,7 +502,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
                 if (share) {
                   await _reportsExportService.shareReport(
                     report,
-                    text: 'Relatorio clinico Brinca+',
+                    text: 'Relatório clínico Brinca+',
                   );
                 } else {
                   await _reportsExportService.saveReport(report);
@@ -514,8 +514,8 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
                   SnackBar(
                     content: Text(
                       share
-                          ? 'Relatorio clinico pronto para compartilhamento.'
-                          : 'Relatorio clinico exportado com sucesso.',
+                          ? 'Relatório clínico pronto para compartilhamento.'
+                          : 'Relatório clínico exportado com sucesso.',
                     ),
                   ),
                 );
@@ -528,7 +528,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
                 if (!mounted) return;
                 ScaffoldMessenger.of(this.context).showSnackBar(
                   const SnackBar(
-                    content: Text('Nao foi possivel gerar o relatorio clinico.'),
+                    content: Text('Não foi possível gerar o relatório clínico.'),
                   ),
                 );
               } finally {
@@ -550,7 +550,7 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Gerar Relatorio Clinico',
+                    'Gerar Relatório Clínico',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -559,14 +559,14 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Selecione o periodo para exportar os dados.',
+                    'Selecione o período para exportar os dados.',
                     style: TextStyle(color: Color(0xFF4A5565)),
                   ),
                   const SizedBox(height: 14),
                   DropdownButtonFormField<String>(
                     value: selectedPeriod,
                     decoration: InputDecoration(
-                      labelText: 'Periodo',
+                      labelText: 'Período',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -578,15 +578,15 @@ class _ClinicHomePageViewState extends State<ClinicHomePageView> {
                     items: const [
                       DropdownMenuItem(
                         value: 'lastWeek',
-                        child: Text('Ultima semana'),
+                        child: Text('Última semana'),
                       ),
                       DropdownMenuItem(
                         value: 'thisMonth',
-                        child: Text('Mes atual'),
+                        child: Text('Mês atual'),
                       ),
                       DropdownMenuItem(
                         value: 'lastMonth',
-                        child: Text('Ultimo mes'),
+                        child: Text('Último mês'),
                       ),
                     ],
                     onChanged: loading

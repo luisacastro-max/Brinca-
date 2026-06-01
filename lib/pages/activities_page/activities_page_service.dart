@@ -74,7 +74,7 @@ class ActivitiesPageService {
     final options = children
         .map((item) {
           final id = (item['_id'] ?? item['id'] ?? '').toString().trim();
-          final name = (item['name'] ?? 'Crianca').toString().trim();
+          final name = (item['name'] ?? 'Criança').toString().trim();
           if (id.isEmpty) return null;
           return ActivityChildOption(id: id, name: name);
         })
@@ -131,23 +131,23 @@ class ActivitiesPageService {
     final areaLabel = _firstText([
       json['areaLabel'],
       goals.isEmpty ? '' : goals.first,
-      'Nao informado',
+      'Não informado',
     ]);
     final neuroDescription = _firstText([
       json['neuroDescription'],
       json['neurodivergenceDescription'],
-      'Sem observacoes especificas para neurodivergencia.',
+      'Sem observações específicas para neurodivergência.',
     ]);
 
     return ActivityDetailsModel(
       id: (json['_id'] ?? json['id'] ?? '').toString(),
       title: (json['title'] ?? 'Atividade').toString(),
-      description: (json['description'] ?? 'Sem descricao.').toString(),
+      description: (json['description'] ?? 'Sem descrição.').toString(),
       isFree: _asBool(json['isFree']),
       durationLabel: durationLabel,
       ageLabel: ageLabel,
       areaLabel: areaLabel,
-      difficulty: (json['difficulty'] ?? 'Nao informado').toString(),
+      difficulty: (json['difficulty'] ?? 'Não informado').toString(),
       isNeurodivergentValid: _asBool(
         json['isNeurodivergentValid'] ?? json['neurodivergenceValidated'],
       ),
@@ -220,7 +220,7 @@ class ActivitiesPageService {
     if (completedActivityIds.isEmpty) {
       throw const ServiceException(
         statusCode: 400,
-        message: 'Nao ha registros iniciados para concluir esta atividade.',
+        message: 'Não há registros iniciados para concluir esta atividade.',
       );
     }
 
@@ -289,12 +289,12 @@ class ActivitiesPageService {
       final text = (value ?? '').toString().trim();
       if (text.isNotEmpty) return text;
     }
-    return 'Nao informado';
+    return 'Não informado';
   }
 
   String _legacyDurationLabel(dynamic value) {
     final durationMinutes = _asInt(value);
-    return durationMinutes <= 0 ? 'Nao informado' : '$durationMinutes min';
+    return durationMinutes <= 0 ? 'Não informado' : '$durationMinutes min';
   }
 
   int _asInt(dynamic value) {
@@ -322,6 +322,6 @@ class ActivitiesPageService {
       }
     }
 
-    return value.trim().isEmpty ? 'Nao informado' : value;
+    return value.trim().isEmpty ? 'Não informado' : value;
   }
 }
