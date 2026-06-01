@@ -7,7 +7,7 @@ import 'package:app_twins/pages/home_page/widgets/home_drawer_item.dart';
 import 'package:app_twins/pages/home_page/widgets/home_week_summary_card.dart';
 import 'package:app_twins/pages/login_page/login_page_router.dart';
 import 'package:app_twins/pages/premium_plans_page/premium_plans_page_router.dart';
-import 'package:app_twins/progress_dashboard_page.dart';
+import 'package:app_twins/pages/progress_dashboard_page/progress_dashboard_page_router.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/core/service_exception.dart';
@@ -168,11 +168,7 @@ class _HomePageViewState extends State<HomePageView> {
           iconColors: const [Color(0xFFC975F0), Color(0xFFFF89B4)],
           title: 'Progresso Semanal',
           subtitle: 'Veja o resumo da semana',
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ProgressDashboardPage()),
-            );
-          },
+          onTap: () => ProgressDashboardPageRouter.go(context),
         ),
         const SizedBox(height: 14),
         HomeWeekSummaryCard(
@@ -263,11 +259,7 @@ class _HomePageViewState extends State<HomePageView> {
                 label: 'Progresso Semanal',
                 onTap: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ProgressDashboardPage(),
-                    ),
-                  );
+                  ProgressDashboardPageRouter.go(context);
                 },
               ),
               HomeDrawerItem(
